@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.coroutines.*
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.*
 import org.jetbrains.kotlin.ir.backend.js.lower.interfaces.CollectClassesForInstanceCheckLowering
 import org.jetbrains.kotlin.ir.backend.js.lower.interfaces.CollectInterfacesForInstanceCheckLowering
-import org.jetbrains.kotlin.ir.backend.js.lower.interfaces.CollectReflectedInterfacesLowering
+import org.jetbrains.kotlin.ir.backend.js.lower.interfaces.SubstituteTypeCheckableInterfacesLowering
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
@@ -522,6 +522,12 @@ private val privateMemberUsagesLoweringPhase = makeBodyLoweringPhase(
     description = "Rewrite the private member usages"
 )
 
+private val propertyReferenceLoweringPhase = makeBodyLoweringPhase(
+    ::PropertyReferenceLowering,
+    name = "PropertyReferenceLowering",
+    description = "Transform property references",
+)
+
 private val interopCallableReferenceLoweringPhase = makeBodyLoweringPhase(
     ::InteropCallableReferenceLowering,
     name = "InteropCallableReferenceLowering",
@@ -654,12 +660,6 @@ private val singleAbstractMethodPhase = makeBodyLoweringPhase(
     description = "Replace SAM conversions with instances of interface-implementing classes"
 )
 
-private val reflectedInterfacesAnnotatingLowering = makeBodyLoweringPhase(
-    ::CollectReflectedInterfacesLowering,
-    name = "CollectReflectedInterfacesLowering",
-    description = "Annotate interfaces which are used inside reflection to generate some extra code for reflection support"
-)
-
 private val typeOperatorLoweringPhase = makeBodyLoweringPhase(
     ::TypeOperatorLowering,
     name = "TypeOperatorLowering",
@@ -668,7 +668,7 @@ private val typeOperatorLoweringPhase = makeBodyLoweringPhase(
         bridgesConstructionPhase,
         removeInlineDeclarationsWithReifiedTypeParametersLoweringPhase,
         singleAbstractMethodPhase, errorExpressionLoweringPhase,
-        interopCallableReferenceLoweringPhase, reflectedInterfacesAnnotatingLowering
+        interopCallableReferenceLoweringPhase,
     )
 )
 
@@ -745,7 +745,7 @@ private val classReferenceLoweringPhase = makeBodyLoweringPhase(
     ::ClassReferenceLowering,
     name = "ClassReferenceLowering",
     description = "Handle class references",
-    prerequisite = setOf(jsClassUsageInReflectionPhase, reflectedInterfacesAnnotatingLowering)
+    prerequisite = setOf(jsClassUsageInReflectionPhase)
 )
 
 private val primitiveCompanionLoweringPhase = makeBodyLoweringPhase(
@@ -818,11 +818,11 @@ private val collectClassesForInstanceCheckLowering = makeDeclarationTransformerP
     prerequisite = setOf(collectInterfacesForInstanceCheckLowering)
 )
 
-private val propertyReferenceLoweringPhase = makeBodyLoweringPhase(
-    ::PropertyReferenceLowering,
-    name = "PropertyReferenceLowering",
-    description = "Transform property references",
-    prerequisite = setOf(collectClassesForInstanceCheckLowering)
+private val substituteTypeCheckableInterfacesLowering = makeBodyLoweringPhase(
+    ::SubstituteTypeCheckableInterfacesLowering,
+    name = "SubstituteTypeCheckableInterfacesLowering",
+    description = "Put only type checkable interfaces inside property references intrinsics",
+    prerequisite = setOf(collectClassesForInstanceCheckLowering, propertyReferenceLoweringPhase)
 )
 
 private val cleanupLoweringPhase = makeBodyLoweringPhase(
@@ -899,6 +899,7 @@ val loweringList = listOf<Lowering>(
     externalEnumUsageLoweringPhase,
     enumEntryRemovalLoweringPhase,
     suspendFunctionsLoweringPhase,
+    propertyReferenceLoweringPhase,
     interopCallableReferenceLoweringPhase,
     jsSuspendArityStorePhase,
     addContinuationToNonLocalSuspendFunctionsLoweringPhase,
@@ -931,7 +932,6 @@ val loweringList = listOf<Lowering>(
     errorExpressionLoweringPhase,
     errorDeclarationLoweringPhase,
     bridgesConstructionPhase,
-    reflectedInterfacesAnnotatingLowering,
     typeOperatorLoweringPhase,
     secondaryConstructorLoweringPhase,
     secondaryFactoryInjectorLoweringPhase,
@@ -939,7 +939,6 @@ val loweringList = listOf<Lowering>(
     constLoweringPhase,
     inlineClassDeclarationLoweringPhase,
     inlineClassUsageLoweringPhase,
-    propertyReferenceLoweringPhase,
     autoboxingTransformerPhase,
     blockDecomposerLoweringPhase,
     objectDeclarationLoweringPhase,
@@ -952,6 +951,9 @@ val loweringList = listOf<Lowering>(
     collectInterfacesForInstanceCheckLowering,
     collectClassesForInstanceCheckLowering,
     cleanupLoweringPhase,
+    collectInterfacesForInstanceCheckLowering,
+    collectClassesForInstanceCheckLowering,
+    substituteTypeCheckableInterfacesLowering,
     // Currently broken due to static members lowering making single-open-class
     // files non-recognizable as single-class files
     // moveOpenClassesToSeparatePlaceLowering,
