@@ -324,27 +324,45 @@ class MemberDeserializer(private val c: DeserializationContext) {
         val callableDescriptor = c.containingDeclaration as CallableDescriptor
         val containerOfCallable = callableDescriptor.containingDeclaration.asProtoContainer()
 
-        return valueParameters.mapIndexed { i, proto ->
-            val flags = if (proto.hasFlags()) proto.flags else 0
-            val annotations = if (containerOfCallable != null && Flags.HAS_ANNOTATIONS.get(flags)) {
-                NonEmptyDeserializedAnnotations(c.storageManager) {
-                    c.components.annotationAndConstantLoader
-                        .loadValueParameterAnnotations(containerOfCallable, callable, kind, i, proto)
-                        .toList()
+        val params = mutableListOf<String>()
+
+        try {
+            c.typeDeserializer.debugInfo = StringBuilder()
+
+            return valueParameters.mapIndexed { i, proto ->
+                val flags = if (proto.hasFlags()) proto.flags else 0
+                val annotations = if (containerOfCallable != null && Flags.HAS_ANNOTATIONS.get(flags)) {
+                    NonEmptyDeserializedAnnotations(c.storageManager) {
+                        c.components.annotationAndConstantLoader
+                            .loadValueParameterAnnotations(containerOfCallable, callable, kind, i, proto)
+                            .toList()
+                    }
+                } else Annotations.EMPTY
+                try {
+                    c.typeDeserializer.debugInfo?.clear()
+                    ValueParameterDescriptorImpl(
+                        callableDescriptor, null, i,
+                        annotations,
+                        c.nameResolver.getName(proto.name),
+                        c.typeDeserializer.type(proto.type(c.typeTable)),
+                        Flags.DECLARES_DEFAULT_VALUE.get(flags),
+                        Flags.IS_CROSSINLINE.get(flags),
+                        Flags.IS_NOINLINE.get(flags),
+                        proto.varargElementType(c.typeTable)?.let { c.typeDeserializer.type(it) },
+                        SourceElement.NO_SOURCE
+                    ).also { params.add("${it.name}: ${it.type}") }
+                } catch (e: Throwable) {
+                    params.add("${c.nameResolver.getName(proto.name)}: ???")
+                    val message = e.message + "\n[valueParameters]\n" +
+                            "containingDeclarationName: ${c.containingDeclaration.name} containerSource: ${c.containerSource?.presentableString} params:\n" +
+                            params.joinToString(separator = "\n") + "\n" +
+                            c.typeDeserializer.debugInfo.toString()
+                    throw RuntimeException(message, e.cause)
                 }
-            } else Annotations.EMPTY
-            ValueParameterDescriptorImpl(
-                callableDescriptor, null, i,
-                annotations,
-                c.nameResolver.getName(proto.name),
-                c.typeDeserializer.type(proto.type(c.typeTable)),
-                Flags.DECLARES_DEFAULT_VALUE.get(flags),
-                Flags.IS_CROSSINLINE.get(flags),
-                Flags.IS_NOINLINE.get(flags),
-                proto.varargElementType(c.typeTable)?.let { c.typeDeserializer.type(it) },
-                SourceElement.NO_SOURCE
-            )
-        }.toList()
+            }.toList()
+        } finally {
+            c.typeDeserializer.debugInfo = null
+        }
     }
 
     private fun DeclarationDescriptor.asProtoContainer(): ProtoContainer? = when (this) {

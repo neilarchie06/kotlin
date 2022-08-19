@@ -23,18 +23,23 @@ import org.jetbrains.kotlin.resolve.getResolutionAnchorIfAny
 fun ModuleDescriptor.findClassifierAcrossModuleDependencies(classId: ClassId): ClassifierDescriptor? = withResolutionAnchor {
     val packageViewDescriptor = getPackage(classId.packageFqName)
     val segments = classId.relativeClassName.pathSegments()
-    val topLevelClass = packageViewDescriptor.memberScope.getContributedClassifier(
-        segments.first(),
-        NoLookupLocation.FROM_DESERIALIZATION
-    ) ?: return@withResolutionAnchor null
-    var result = topLevelClass
-    for (name in segments.subList(1, segments.size)) {
-        if (result !is ClassDescriptor) return@withResolutionAnchor null
-        result = result.unsubstitutedInnerClassesScope
-            .getContributedClassifier(name, NoLookupLocation.FROM_DESERIALIZATION) as? ClassDescriptor
-            ?: return@withResolutionAnchor null
+    try {
+        val topLevelClass = packageViewDescriptor.memberScope.getContributedClassifier(
+            segments.first(),
+            NoLookupLocation.FROM_DESERIALIZATION
+        ) ?: return@withResolutionAnchor null
+        var result = topLevelClass
+        for (name in segments.subList(1, segments.size)) {
+            if (result !is ClassDescriptor) return@withResolutionAnchor null
+            result = result.unsubstitutedInnerClassesScope
+                .getContributedClassifier(name, NoLookupLocation.FROM_DESERIALIZATION) as? ClassDescriptor
+                ?: return@withResolutionAnchor null
+        }
+        return@withResolutionAnchor result
+    } catch (e: Throwable) {
+        val message = e.message + "\n[findClassifierAcrossModuleDependencies]\n" + "classId=$classId"
+        throw RuntimeException(message, e.cause)
     }
-    return@withResolutionAnchor result
 }
 
 private inline fun ModuleDescriptor.withResolutionAnchor(

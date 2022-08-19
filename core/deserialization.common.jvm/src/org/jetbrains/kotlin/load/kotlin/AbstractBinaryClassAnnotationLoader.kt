@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.protobuf.MessageLite
 import org.jetbrains.kotlin.serialization.deserialization.AnnotatedCallableKind
 import org.jetbrains.kotlin.serialization.deserialization.AnnotationLoader
 import org.jetbrains.kotlin.serialization.deserialization.ProtoContainer
+import org.jetbrains.kotlin.serialization.deserialization.getClassId
 
 abstract class AbstractBinaryClassAnnotationLoader<A : Any, S : AbstractBinaryClassAnnotationLoader.AnnotationsContainer<A>>(
     protected val kotlinClassFinder: KotlinClassFinder
@@ -190,7 +191,14 @@ abstract class AbstractBinaryClassAnnotationLoader<A : Any, S : AbstractBinaryCl
     }
 
     override fun loadTypeAnnotations(proto: ProtoBuf.Type, nameResolver: NameResolver): List<A> {
-        return proto.getExtension(JvmProtoBuf.typeAnnotation).map { loadTypeAnnotation(it, nameResolver) }
+        val annotations = proto.getExtension(JvmProtoBuf.typeAnnotation)
+        try {
+            return annotations.map { loadTypeAnnotation(it, nameResolver) }
+        } catch (e: Throwable) {
+            val message = e.message + "\n[loadTypeAnnotations]\n" + "type=${nameResolver.getClassId(proto.className)} annotations=" +
+                    annotations.joinToString(separator = ",") { nameResolver.getClassId(it.id).toString() }
+            throw RuntimeException(message, e.cause)
+        }
     }
 
     override fun loadTypeParameterAnnotations(proto: ProtoBuf.TypeParameter, nameResolver: NameResolver): List<A> {

@@ -81,10 +81,14 @@ class ReflectKotlinClass private constructor(
 
 private object ReflectClassStructure {
     fun loadClassAnnotations(klass: Class<*>, visitor: KotlinJvmBinaryClass.AnnotationVisitor) {
-        for (annotation in klass.declaredAnnotations) {
-            processAnnotation(visitor, annotation)
+        try {
+            for (annotation in klass.declaredAnnotations) {
+                processAnnotation(visitor, annotation)
+            }
+            visitor.visitEnd()
+        } catch (e: Throwable) {
+            throw RuntimeException("[loadClassAnnotations]\nklass=$klass", e)
         }
-        visitor.visitEnd()
     }
 
     fun visitMembers(klass: Class<*>, memberVisitor: KotlinJvmBinaryClass.MemberVisitor) {

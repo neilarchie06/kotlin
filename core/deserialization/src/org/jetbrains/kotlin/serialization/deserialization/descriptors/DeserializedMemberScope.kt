@@ -326,7 +326,13 @@ abstract class DeserializedMemberScope protected constructor(
 
         override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<SimpleFunctionDescriptor> {
             if (name !in functionNames) return emptyList()
-            return functions(name)
+            return try {
+                functions(name)
+            } catch (e: Throwable) {
+                val message = e.message + "\n[getContributedFunctions]\n" +
+                        "name=$name, functionNames=" + functionNames.joinToString()
+                throw RuntimeException(message, e.cause)
+            }
         }
 
         override fun getTypeAliasByName(name: Name): TypeAliasDescriptor? {

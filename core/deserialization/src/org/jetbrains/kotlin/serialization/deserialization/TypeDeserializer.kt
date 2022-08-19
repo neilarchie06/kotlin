@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedAnnotations
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedTypeParameterDescriptor
 import org.jetbrains.kotlin.types.*
@@ -94,16 +95,30 @@ class TypeDeserializer(
             return ErrorUtils.createErrorType(ErrorTypeKind.TYPE_FOR_ERROR_TYPE_CONSTRUCTOR, constructor, constructor.toString())
         }
 
+        debugInfo?.appendLine("constructor.declarationDescriptor?.name: ${constructor.declarationDescriptor?.name}")
+        debugInfo?.appendLine("constructor.declarationDescriptor?.fqNameUnsafe: ${constructor.declarationDescriptor?.fqNameUnsafe}")
+        debugInfo?.appendLine("constructor.declarationDescriptor?.fqNameSafe: ${constructor.declarationDescriptor?.fqNameSafe}")
+        debugInfo?.appendLine("constructor.declarationDescriptor?.defaultType: ${constructor.declarationDescriptor?.defaultType}")
+
         val annotations = DeserializedAnnotations(c.storageManager) {
             c.components.annotationAndConstantLoader.loadTypeAnnotations(proto, c.nameResolver)
         }
 
+        debugInfo?.append("annotations: ")
+        annotations.forEach {
+            debugInfo?.append("type=${it.type}|fqName=${it.fqName}|allValueArguments=${it.allValueArguments} --- ")
+        }
+        debugInfo?.appendLine()
+
         val attributes = c.components.typeAttributeTranslators.toAttributes(annotations, constructor, c.containingDeclaration)
+
+        debugInfo?.appendLine("attributes: ${attributes.joinToString(separator = "--") { "type=${it.key}" }}")
 
         fun ProtoBuf.Type.collectAllArguments(): List<ProtoBuf.Type.Argument> =
             argumentList + outerType(c.typeTable)?.collectAllArguments().orEmpty()
 
         val arguments = proto.collectAllArguments().mapIndexed { index, argumentProto ->
+            debugInfo?.appendLine("typeArgument index=$index, proto=$argumentProto")
             typeArgument(constructor.parameters.getOrNull(index), argumentProto)
         }.toList()
 
@@ -297,8 +312,12 @@ class TypeDeserializer(
         val type = typeArgumentProto.type(c.typeTable)
             ?: return TypeProjectionImpl(ErrorUtils.createErrorType(ErrorTypeKind.NO_RECORDED_TYPE, typeArgumentProto.toString()))
 
+        debugInfo?.appendLine("projection=${projection.name}")
+
         return TypeProjectionImpl(projection, type(type))
     }
 
     override fun toString() = debugName + (if (parent == null) "" else ". Child of ${parent.debugName}")
+
+    var debugInfo: StringBuilder? = null
 }
