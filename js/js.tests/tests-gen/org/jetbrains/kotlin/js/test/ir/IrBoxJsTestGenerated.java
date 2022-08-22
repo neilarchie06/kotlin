@@ -1285,6 +1285,12 @@ public class IrBoxJsTestGenerated extends AbstractIrBoxJsTest {
         }
 
         @Test
+        @TestMetadata("interfaceSuperCall.kt")
+        public void testInterfaceSuperCall() throws Exception {
+            runTest("js/js.translator/testData/box/defaultArguments/interfaceSuperCall.kt");
+        }
+
+        @Test
         @TestMetadata("overloadFunWithDefArg.kt")
         public void testOverloadFunWithDefArg() throws Exception {
             runTest("js/js.translator/testData/box/defaultArguments/overloadFunWithDefArg.kt");
@@ -2582,6 +2588,12 @@ public class IrBoxJsTestGenerated extends AbstractIrBoxJsTest {
         @TestMetadata("exportClassWithInternalOneFile.kt")
         public void testExportClassWithInternalOneFile() throws Exception {
             runTest("js/js.translator/testData/box/export/exportClassWithInternalOneFile.kt");
+        }
+
+        @Test
+        @TestMetadata("exportDefaultParameterAndOverrideIt.kt")
+        public void testExportDefaultParameterAndOverrideIt() throws Exception {
+            runTest("js/js.translator/testData/box/export/exportDefaultParameterAndOverrideIt.kt");
         }
 
         @Test
