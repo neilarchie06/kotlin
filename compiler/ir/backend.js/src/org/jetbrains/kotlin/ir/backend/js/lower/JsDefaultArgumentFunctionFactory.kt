@@ -22,7 +22,7 @@ class JsDefaultArgumentFunctionFactory(override val context: JsIrBackendContext)
         copyTypeParametersFrom(original)
         copyReturnTypeFrom(original)
         copyReceiversFrom(original)
-        copyValueParametersFrom(original)
+        copyValueParametersFrom(original, wrapWithNullable = false)
 
         if (!original.isTopLevel) {
             introduceContextParam()

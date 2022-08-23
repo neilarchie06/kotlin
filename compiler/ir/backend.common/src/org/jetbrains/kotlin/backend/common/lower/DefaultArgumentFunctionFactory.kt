@@ -39,10 +39,10 @@ abstract class DefaultArgumentFunctionFactory(open val context: CommonBackendCon
         contextReceiverParametersCount = original.contextReceiverParametersCount
     }
 
-    protected fun IrFunction.copyValueParametersFrom(original: IrFunction) {
+    protected fun IrFunction.copyValueParametersFrom(original: IrFunction, wrapWithNullable: Boolean = true) {
         valueParameters = original.valueParameters.map {
             val newType = it.type.remapTypeParameters(original.classIfConstructor, classIfConstructor)
-            val makeNullable = it.defaultValue != null &&
+            val makeNullable = wrapWithNullable && it.defaultValue != null &&
                     (context.ir.unfoldInlineClassType(it.type) ?: it.type) !in context.irBuiltIns.primitiveIrTypes
             it.copyTo(
                 this,
