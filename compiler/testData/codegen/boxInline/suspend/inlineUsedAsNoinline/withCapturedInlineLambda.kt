@@ -7,27 +7,27 @@
 package flow
 
 interface Flow {
-    suspend fun collect(collector: FlowCollector)
+    fun collect(collector: FlowCollector)
 }
 
 interface FlowCollector {
-    suspend fun emit(value: String)
+    fun emit(value: String)
 }
 
-inline fun flow(crossinline body: suspend FlowCollector.() -> Unit): Flow =
+inline fun flow(crossinline body: FlowCollector.() -> Unit): Flow =
     object : Flow {
-        override suspend fun collect(collector: FlowCollector) = collector.body()
+        override fun collect(collector: FlowCollector) = collector.body()
     }
 
-suspend inline fun Flow.collect(crossinline body: suspend (String) -> Unit) =
+inline fun Flow.collect(crossinline body: (String) -> Unit) =
     collect(object : FlowCollector {
-        override suspend fun emit(value: String) = body(value)
+        override fun emit(value: String) = body(value)
     })
 
-inline fun Flow.transform(crossinline transformer: suspend FlowCollector.(value: String) -> Unit): Flow =
+inline fun Flow.transform(crossinline transformer: FlowCollector.(value: String) -> Unit): Flow =
     flow { collect { value -> transformer(value) } }
 
-inline fun Flow.map(crossinline transformer: suspend (value: String) -> String): Flow =
+inline fun Flow.map(crossinline transformer: (value: String) -> String): Flow =
     transform { value -> emit(transformer(value)) }
 
 // FILE: box.kt
@@ -38,18 +38,13 @@ import kotlin.reflect.jvm.*
 import kotlin.coroutines.*
 import kotlin.coroutines.intrinsics.*
 
-suspend fun addK(x: String): String = suspendCoroutineUninterceptedOrReturn { cont ->
-    cont.resume(x + "K")
-    COROUTINE_SUSPENDED
-}
+fun addK(x: String): String = x + "K"
 
 var result = ""
 
 fun box(): String {
-    suspend {
-        val source = flow { emit("O") }
-        val reference: (suspend (String) -> String) -> Flow = source::map
-        ((reference as KFunction<*>).javaMethod!!.invoke(null, source, ::addK) as Flow).collect { result = it }
-    }.startCoroutine(EmptyContinuation)
+    val source = flow { emit("O") }
+    val reference: ((String) -> String) -> Flow = source::map
+    ((reference as KFunction<*>).javaMethod!!.invoke(null, source, ::addK) as Flow).collect { result = it }
     return result
 }
