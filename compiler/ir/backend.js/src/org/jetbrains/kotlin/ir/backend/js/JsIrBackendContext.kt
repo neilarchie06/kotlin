@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.compilationException
 import org.jetbrains.kotlin.backend.common.ir.Ir
 import org.jetbrains.kotlin.backend.common.ir.Symbols
 import org.jetbrains.kotlin.builtins.PrimitiveType
+import org.jetbrains.kotlin.builtins.isFunctionType
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -221,7 +222,9 @@ class JsIrBackendContext(
                 coroutineSymbols.coroutineSuspendedGetter
 
             override val enumEntries = getIrClass(ENUMS_PACKAGE_FQNAME.child(Name.identifier("EnumEntries")))
-            override val createEnumEntries = symbolTable.referenceSimpleFunction(getFunctions(ENUMS_PACKAGE_FQNAME.child(Name.identifier("enumEntries"))).single())
+            override val createEnumEntries = getFunctions(ENUMS_PACKAGE_FQNAME.child(Name.identifier("enumEntries")))
+                .find { it.valueParameters.firstOrNull()?.type?.isFunctionType == true }
+                .let { symbolTable.referenceSimpleFunction(it!!) }
 
             private val _arraysContentEquals = getFunctions(FqName("kotlin.collections.contentEquals")).mapNotNull {
                 if (it.extensionReceiverParameter != null && it.extensionReceiverParameter!!.type.isNullable())
