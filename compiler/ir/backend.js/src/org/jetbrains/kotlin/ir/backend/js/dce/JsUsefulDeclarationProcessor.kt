@@ -111,8 +111,9 @@ internal class JsUsefulDeclarationProcessor(
 
     override fun processSimpleFunction(irFunction: IrSimpleFunction) {
         super.processSimpleFunction(irFunction)
-        val property = irFunction.correspondingPropertySymbol ?: return
-        if (property.owner.isExported(context)) {
+        val property = irFunction.correspondingPropertySymbol?.owner ?: return
+
+        if (property.isExported(context) || property.isOverriddenExternal()) {
             context.intrinsics.jsDefinePropertySymbol.owner.enqueue(irFunction, "property for export")
         }
     }

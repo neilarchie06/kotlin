@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.lower.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.JsLoweredDeclarationOrigin
+import org.jetbrains.kotlin.ir.backend.js.JsStatementOrigins
 import org.jetbrains.kotlin.ir.backend.js.export.isExported
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
 import org.jetbrains.kotlin.ir.backend.js.utils.JsAnnotations
@@ -161,7 +162,7 @@ class JsDefaultArgumentStubGenerator(override val context: JsIrBackendContext) :
                     )
                 }
 
-            val wrappedFunctionCall = irCall(originalDeclaration).apply {
+            val wrappedFunctionCall = irCall(originalDeclaration, JsStatementOrigins.IMPLEMENTATION_DELEGATION_CALL).apply {
                 passTypeArgumentsFrom(originalDeclaration)
                 dispatchReceiver = dispatchReceiverParameter?.let { irGet(it) }
                 extensionReceiver = extensionReceiverParameter?.let { irGet(it) }
