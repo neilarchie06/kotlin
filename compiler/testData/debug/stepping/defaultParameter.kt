@@ -26,6 +26,8 @@ fun box() {
 // EXPECTATIONS JS_IR
 // test.kt:11 box
 // test.kt:11 box
-// test.kt:6 A.foo$default_xztx5c_k$
-// test.kt:4 A.computeParam_vubdyi_k$
-// test.kt:6 A.foo$default_xztx5c_k$
+// test.kt:6 protoOf.foo$default_ourpn2_k$
+// test.kt:4 protoOf.computeParam_vubdyi_k$
+// test.kt:6 protoOf.foo$default_ourpn2_k$
+// test.kt:6 protoOf.foo$default_ourpn2_k$
+// test.kt:6 protoOf.foo$default_ourpn2_k$

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.ir.backend.js.lower
 
 import org.jetbrains.kotlin.backend.common.lower.*
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.JsLoweredDeclarationOrigin
@@ -178,8 +179,10 @@ class JsDefaultArgumentStubGenerator(override val context: JsIrBackendContext) :
                 val superContext = valueParameters.last().also {
                     superContextValueParam = it
                 }
-                val realOverrideTarget = originalDeclaration.realOverrideTarget
-                if (realOverrideTarget.parentClassOrNull?.isInterface == true) {
+                val realOverrideTarget = originalDeclaration.realOverrideTarget.takeIf {
+                    it !is IrOverridableMember || it.modality !== Modality.ABSTRACT
+                }
+                if (realOverrideTarget?.parentClassOrNull?.isInterface == true) {
                     irCall(realOverrideTarget).apply {
                         extensionReceiver = wrappedFunctionCall.extensionReceiver?.deepCopyWithSymbols()
                         (0 until wrappedFunctionCall.valueArgumentsCount).forEach {
