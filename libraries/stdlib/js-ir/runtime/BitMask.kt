@@ -52,7 +52,7 @@ internal class BitMask(activeBits: IntArray) {
 
     init {
         if (activeBits.size > 0) {
-            intArray = IntArray(JsMath.max(*activeBits) / INT_SIZE + 1)
+            intArray = IntArray(JsMath.asDynamic().max.apply(null, activeBits) / INT_SIZE + 1)
             for (activeBit in activeBits) {
                 val numberIndex = activeBit / INT_SIZE
                 val positionInNumber = activeBit % INT_SIZE
