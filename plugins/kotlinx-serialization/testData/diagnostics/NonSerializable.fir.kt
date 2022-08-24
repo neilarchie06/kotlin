@@ -5,12 +5,12 @@ import kotlinx.serialization.*
 class NonSerializable
 
 @Serializable
-class Basic(val foo: NonSerializable)
+class Basic(val foo: <!SERIALIZER_NOT_FOUND!>NonSerializable<!>)
 
 @Serializable
-class Inside(val foo: List<NonSerializable>)
+class Inside(val foo: <!SERIALIZER_NOT_FOUND!>List<NonSerializable><!>)
 
 @Serializable
 class WithImplicitType {
-    val foo = NonSerializable()
+    <!SERIALIZER_NOT_FOUND!>val foo = NonSerializable()<!>
 }

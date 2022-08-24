@@ -14,4 +14,4 @@ class NopeNullableSerializer: KSerializer<Nope?> {
 }
 
 @Serializable
-class Foo(val foo: Nope)
+class Foo(val foo: <!SERIALIZER_NULLABILITY_INCOMPATIBLE!>Nope<!>)

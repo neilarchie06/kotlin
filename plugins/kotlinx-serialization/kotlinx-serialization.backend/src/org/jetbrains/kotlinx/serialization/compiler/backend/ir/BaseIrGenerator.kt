@@ -34,9 +34,14 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.util.OperatorNameConventions
-import org.jetbrains.kotlinx.serialization.compiler.backend.jvm.*
 import org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationPluginContext
 import org.jetbrains.kotlinx.serialization.compiler.resolve.*
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.contextSerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.enumSerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.objectSerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.polymorphicSerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.referenceArraySerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.sealedSerializerId
 
 abstract class BaseIrGenerator(private val currentClass: IrClass, final override val compilerContext: SerializationPluginContext) :
     IrBuilderWithPluginContext {

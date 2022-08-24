@@ -5,5 +5,5 @@ import kotlinx.serialization.*
 @Serializable
 open class Parent(open val arg: Int)
 
-@Serializable
+<!DUPLICATE_SERIAL_NAME!>@Serializable<!>
 class Derived(override val arg: Int): Parent(arg)

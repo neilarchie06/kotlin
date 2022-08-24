@@ -5,7 +5,7 @@ import kotlinx.serialization.encoding.*
 
 enum class SimpleEnum { A, B }
 
-enum class MarkedNameEnum { @SerialName("a") A, B}
+<!EXPLICIT_SERIALIZABLE_IS_REQUIRED!>enum class MarkedNameEnum { @SerialName("a") A, B}<!>
 
 @Serializable
 enum class ExplicitlyMarkedEnum { @SerialName("a") A, B}

@@ -26,6 +26,12 @@ import org.jetbrains.kotlin.types.typeUtil.representativeUpperBound
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.*
 import org.jetbrains.kotlinx.serialization.compiler.backend.jvm.*
 import org.jetbrains.kotlinx.serialization.compiler.resolve.*
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.contextSerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.enumSerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.objectSerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.polymorphicSerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.referenceArraySerializerId
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerializationJvmNames.sealedSerializerId
 
 internal class JsBlockBuilder {
     val block: JsBlock = JsBlock()
