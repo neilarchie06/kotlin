@@ -34,6 +34,7 @@ fun generateKotlinGradleOptions(withPrinterToFile: (targetFile: File, Printer.()
 
     // specific Gradle types from internal compiler types
     generateApiVersion(apiSrcDir, withPrinterToFile)
+    generateLanguageVersion(apiSrcDir, withPrinterToFile)
 
     // common interface
     val commonInterfaceFqName = FqName("org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions")
