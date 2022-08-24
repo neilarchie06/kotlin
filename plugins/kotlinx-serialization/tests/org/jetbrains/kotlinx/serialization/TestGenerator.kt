@@ -23,6 +23,11 @@ fun main(args: Array<String>) {
                 model("diagnostics", excludedPattern = excludedFirTestdataPattern)
             }
 
+            testClass<AbstractSerializationFirDiagnosticTest> {
+                model("diagnostics", excludedPattern = excludedFirTestdataPattern)
+                model("firMembers")
+            }
+
             // ------------------------------- asm instructions -------------------------------
 
             testClass<AbstractSerializationAsmLikeInstructionsListingTest> {
@@ -30,6 +35,10 @@ fun main(args: Array<String>) {
             }
 
             testClass<AbstractSerializationIrAsmLikeInstructionsListingTest> {
+                model("codegen")
+            }
+
+            testClass<AbstractSerializationFirAsmLikeInstructionsListingTest> {
                 model("codegen")
             }
 
