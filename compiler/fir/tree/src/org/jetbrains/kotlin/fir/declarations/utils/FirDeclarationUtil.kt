@@ -24,6 +24,7 @@ val FirClassLikeDeclaration.classId
 
 val FirClass.classId: ClassId get() = symbol.classId
 
+// TODO: damn shit
 val FirClassSymbol<*>.superConeTypes: List<ConeClassLikeType>
     get() = when (this) {
         is FirRegularClassSymbol -> fir.superConeTypes
