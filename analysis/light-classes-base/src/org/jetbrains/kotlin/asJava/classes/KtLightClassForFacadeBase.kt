@@ -34,7 +34,7 @@ abstract class KtLightClassForFacadeBase constructor(
     final override val files: Collection<KtFile>
 ) : KtLightClassBase(files.first().manager), KtLightClassForFacade {
     init {
-        require(files.isNotEmpty())
+        require(files.isNotEmpty()) { "facade must have at least one file under the hood" }
     }
 
     private val firstFileInFacade by lazyPub { files.first() }
