@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2022 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the LICENSE file.
  */
 
@@ -9,7 +9,8 @@ import kotlinx.cinterop.NativePtr
 import kotlin.native.internal.*
 
 /**
- * Atomic values and freezing: atomics [AtomicInt], [AtomicLong], [AtomicNativePtr] and [AtomicReference]
+ *
+ * Legacy MM: Atomic values and freezing: atomics [AtomicInt], [AtomicLong], [AtomicNativePtr] and [AtomicReference]
  * are unique types with regard to freezing. Namely, they provide mutating operations, while can participate
  * in frozen subgraphs. So shared frozen objects can have fields of atomic types.
  */
@@ -169,11 +170,12 @@ public class AtomicNativePtr(private var value_: NativePtr) {
 
     /**
      * Compares value with [expected] and replaces it with [new] value if values matches.
-     * If [new] value is not null, it must be frozen or permanent object.
+     *
+     * Legacy MM: ff [new] value is not null, it must be frozen or permanent object.
      *
      * @param expected the expected value
      * @param new the new value
-     * @throws InvalidMutabilityException if [new] is not frozen or a permanent object
+     * @throws InvalidMutabilityException with legacy MM if [new] is not frozen or a permanent object
      * @return the old value
      */
     @GCUnsafeCall("Kotlin_AtomicNativePtr_compareAndSwap")
@@ -233,7 +235,7 @@ public class AtomicReference<T> {
 
     /**
      * Creates a new atomic reference pointing to given [ref].
-     * @throws InvalidMutabilityException if reference is not frozen.
+     * @throws InvalidMutabilityException with legacy MM if reference is not frozen.
      */
     constructor(value: T) {
         if (this.isFrozen) {
@@ -244,10 +246,10 @@ public class AtomicReference<T> {
 
     /**
      * The referenced value.
-     * Gets the value or sets the [new] value. If [new] value is not null,
-     * it must be frozen or permanent object.
+     * Gets the value or sets the [new] value.
+     * Legacy MM: ff [new] value is not null, it must be frozen or permanent object.
      *
-     * @throws InvalidMutabilityException if the value is not frozen or a permanent object
+     * @throws InvalidMutabilityException with legacy MM if the value is not frozen or a permanent object
      */
     public var value: T
         get() = @Suppress("UNCHECKED_CAST")(getImpl() as T)
@@ -256,11 +258,12 @@ public class AtomicReference<T> {
     /**
      * Compares value with [expected] and replaces it with [new] value if values matches.
      * Note that comparison is identity-based, not value-based.
-     * If [new] value is not null, it must be frozen or permanent object.
+     *
+     * Legacy MM: if [new] value is not null, it must be frozen or permanent object.
      *
      * @param expected the expected value
      * @param new the new value
-     * @throws InvalidMutabilityException if the value is not frozen or a permanent object
+     * @throws InvalidMutabilityException with legacy MM if the value is not frozen or a permanent object
      * @return the old value
      */
     @GCUnsafeCall("Kotlin_AtomicReference_compareAndSwap")
@@ -341,11 +344,11 @@ public class FreezableAtomicReference<T>(private var value_: T) {
 
     /**
      * Compares value with [expected] and replaces it with [new] value if values matches.
-     * If [new] value is not null and object is frozen, it must be frozen or permanent object.
+     * Legacy MM: If [new] value is not null and object is frozen, it must be frozen or permanent object.
      *
      * @param expected the expected value
      * @param new the new value
-     * @throws InvalidMutabilityException if the value is not frozen or a permanent object
+     * @throws InvalidMutabilityException with legacy MM if the value is not frozen or a permanent object
      * @return the old value
      */
      public fun compareAndSwap(expected: T, new: T): T {
