@@ -37,6 +37,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExpressionReceiver
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.StubTypeForBuilderInference
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.checker.intersectWrappedTypes
 import org.jetbrains.kotlin.types.error.ErrorUtils
@@ -199,7 +200,18 @@ class DiagnosticReporterByTrackingStrategy(
             }
 
             StubBuilderInferenceReceiver::class.java -> {
-                trace.report(BUILDER_INFERENCE_STUB_RECEIVER.on(callReceiver.psiExpression ?: return))
+                diagnostic as StubBuilderInferenceReceiver
+
+                val stubType = callReceiver.receiver.receiverValue.type as StubTypeForBuilderInference
+                val originalTypeParameter = stubType.originalTypeVariable.originalTypeParameter
+
+                trace.report(
+                    BUILDER_INFERENCE_STUB_RECEIVER.on(
+                        callReceiver.psiExpression ?: call.callElement,
+                        originalTypeParameter?.name ?: SpecialNames.NO_NAME_PROVIDED,
+                        originalTypeParameter?.containingDeclaration?.name ?: SpecialNames.NO_NAME_PROVIDED
+                    )
+                )
             }
         }
     }

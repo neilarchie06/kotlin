@@ -1,0 +1,21 @@
+package
+
+public val </*0*/ T> T.genericLambda: T.((T) -> kotlin.Unit) -> kotlin.Unit
+public fun </*0*/ R> a(/*0*/ lambda: kotlin.collections.List<R>.(R) -> kotlin.Unit): kotlin.Unit
+public fun </*0*/ R> b(/*0*/ lambda: R.(kotlin.collections.List<R>) -> kotlin.Unit): kotlin.Unit
+public fun test1(): kotlin.Unit
+public fun test2(): kotlin.Unit
+public fun test3(): kotlin.Unit
+public fun test4(): kotlin.Unit
+public fun test5(): kotlin.Unit
+public fun test6(): kotlin.Unit
+public fun use(/*0*/ p: kotlin.reflect.KCallable<kotlin.Unit>): kotlin.Unit
+public fun </*0*/ T> T.extension(): kotlin.Unit
+
+public final class Box</*0*/ TIn> {
+    public constructor Box</*0*/ TIn>(/*0*/ t: TIn)
+    public final val t: TIn
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
