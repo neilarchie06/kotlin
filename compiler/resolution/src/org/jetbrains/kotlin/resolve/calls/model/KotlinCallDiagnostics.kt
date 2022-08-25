@@ -69,7 +69,10 @@ class BuilderInferenceOff(val argument: KotlinCallArgument) : KotlinCallDiagnost
     override fun report(reporter: DiagnosticReporter) = reporter.onCallArgument(argument, this)
 }
 
-class StubBuilderInferenceReceiver(val receiver: SimpleKotlinCallArgument) : KotlinCallDiagnostic(RESOLVED) {
+class StubBuilderInferenceReceiver(
+    val receiver: SimpleKotlinCallArgument,
+    val extensionReceiverParameter: ReceiverParameterDescriptor,
+) : KotlinCallDiagnostic(RESOLVED) {
     override fun report(reporter: DiagnosticReporter) = reporter.onCallReceiver(receiver, this)
 }
 
