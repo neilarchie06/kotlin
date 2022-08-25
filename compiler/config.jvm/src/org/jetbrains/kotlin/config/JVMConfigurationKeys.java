@@ -162,4 +162,7 @@ public class JVMConfigurationKeys {
 
     public static final CompilerConfigurationKey<Boolean> IGNORE_CONST_OPTIMIZATION_ERRORS =
             CompilerConfigurationKey.create("Ignore errors from IrConstTransformer");
+
+    public static final CompilerConfigurationKey<Boolean> NO_NEW_JAVA_ANNOTATION_TARGETS =
+            CompilerConfigurationKey.create("Do not generate Java annotation targets TYPE_USE/TYPE_PARAMETER for Kotlin annotation classes with Kotlin targets TYPE/TYPE_PARAMETER");
 }

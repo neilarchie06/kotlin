@@ -524,6 +524,12 @@ Also sets `-jvm-target` value equal to the selected JDK version"""
     )
     var ignoreConstOptimizationErrors: Boolean by FreezableVar(false)
 
+    @Argument(
+        value = "-Xno-new-java-annotation-targets",
+        description = "Do not generate Java annotation targets TYPE_USE/TYPE_PARAMETER for Kotlin annotation classes with Kotlin targets TYPE/TYPE_PARAMETER"
+    )
+    var noNewJavaAnnotationTargets: Boolean by FreezableVar(false)
+
     override fun configureAnalysisFlags(collector: MessageCollector, languageVersion: LanguageVersion): MutableMap<AnalysisFlag<*>, Any> {
         val result = super.configureAnalysisFlags(collector, languageVersion)
         result[JvmAnalysisFlags.strictMetadataVersionSemantics] = strictMetadataVersionSemantics

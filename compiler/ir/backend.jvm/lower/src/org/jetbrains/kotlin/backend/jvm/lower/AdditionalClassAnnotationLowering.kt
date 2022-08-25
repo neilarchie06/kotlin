@@ -113,6 +113,8 @@ private class AdditionalClassAnnotationLowering(private val context: JvmBackendC
     private fun mapTarget(target: KotlinTarget): IrEnumEntry? {
         return when (target) {
             KotlinTarget.TYPE, KotlinTarget.TYPE_PARAMETER -> {
+                if (context.state.noNewJavaAnnotationTargets) return null
+
                 val elementType =
                     context.state.module.findClassAcrossModuleDependencies(ClassId.topLevel(JvmAnnotationNames.ELEMENT_TYPE_ENUM))
                         ?: return null
