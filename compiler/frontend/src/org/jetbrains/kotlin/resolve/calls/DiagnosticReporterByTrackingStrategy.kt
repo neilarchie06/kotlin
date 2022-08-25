@@ -10,9 +10,11 @@ import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor
 import org.jetbrains.kotlin.builtins.isExtensionFunctionType
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.diagnostics.Errors.*
 import org.jetbrains.kotlin.diagnostics.Errors.BadNamedArgumentsTarget.*
 import org.jetbrains.kotlin.diagnostics.reportDiagnosticOnce
+import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.isNull
 import org.jetbrains.kotlin.psi.psiUtil.lastBlockStatementOrThis
@@ -336,8 +338,17 @@ class DiagnosticReporterByTrackingStrategy(
                 )
             }
 
-            BuilderInferenceOff::class.java -> {
-                trace.report(BUILDER_INFERENCE_OFF.on(callArgument.psiCallArgument.valueArgument.asElement()))
+            MultiLambdaBuilderInferenceRestriction::class.java -> {
+                diagnostic as MultiLambdaBuilderInferenceRestriction
+                val typeParameter = diagnostic.typeParameter as? TypeParameterDescriptor
+
+                trace.report(
+                    BUILDER_INFERENCE_MULTI_LAMBDA_RESTRICTION.on(
+                        callArgument.psiCallArgument.valueArgument.asElement(),
+                        typeParameter?.name ?: SpecialNames.NO_NAME_PROVIDED,
+                        typeParameter?.containingDeclaration?.name ?: SpecialNames.NO_NAME_PROVIDED,
+                    )
+                )
             }
         }
     }
