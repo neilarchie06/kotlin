@@ -19,6 +19,9 @@ internal fun jsEqeq(a: Any?, b: Any?): Boolean
 internal fun jsNotEq(a: Any?, b: Any?): Boolean
 
 @JsIntrinsic
+internal fun jsUndefined(): Nothing?
+
+@JsIntrinsic
 internal fun jsEqeqeq(a: Any?, b: Any?): Boolean
 
 @JsIntrinsic
