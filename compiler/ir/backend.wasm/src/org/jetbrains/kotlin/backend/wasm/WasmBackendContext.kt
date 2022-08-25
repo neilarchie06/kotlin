@@ -59,6 +59,11 @@ class WasmBackendContext(
     override val coroutineSymbols =
         JsCommonCoroutineSymbols(symbolTable, module,this)
 
+    override val enumEntries = getIrClass(FqName.fromSegments(listOf("kotlin", "enums", "EnumEntries")))
+    override val createEnumEntries = findFunctions(enumsInternalPackage.memberScope, Name.identifier("enumEntries"))
+        .find { it.valueParameters.firstOrNull()?.type?.isFunctionType == true }
+        .let { symbolTable.referenceSimpleFunction(it!!) }
+
     val innerClassesSupport = JsInnerClassesSupport(mapping, irFactory)
 
     override val internalPackageFqn = FqName("kotlin.wasm")

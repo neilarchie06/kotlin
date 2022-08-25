@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
@@ -529,7 +528,7 @@ class EnumSyntheticFunctionsAndPropertiesLowering(
         return declarations.find { it is IrFunction && it.isStatic && it.returnType.isArray() } as IrFunction
     }
 
-    private fun IrClass.buildEntriesField(entriesHelper: IrFunction): IrField = with(context.ir.symbols) {
+    private fun IrClass.buildEntriesField(entriesHelper: IrFunction): IrField = with(context) {
         addField {
             name = Name.identifier(ENTRIES_FIELD_NAME)
             type = enumEntries.defaultType
@@ -549,7 +548,7 @@ class EnumSyntheticFunctionsAndPropertiesLowering(
 
     private fun IrBuilderWithScope.referenceFor(function: IrFunction, type: IrType): IrDeclarationReference {
         return if (supportRawFunctionReference) {
-            irRawFunctionReference(type, function.symbol)
+            irRawFunctionReferefence(type, function.symbol)
         } else {
             irFunctionReference(type, function.symbol)
         }

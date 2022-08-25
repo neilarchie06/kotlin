@@ -234,9 +234,6 @@ abstract class Symbols<out T : CommonBackendContext>(
 
     abstract val functionAdapter: IrClassSymbol
 
-    abstract val enumEntries: IrClassSymbol
-    abstract val createEnumEntries: IrSimpleFunctionSymbol
-
     open val unsafeCoerceIntrinsic: IrSimpleFunctionSymbol? = null
 
     open val getWithoutBoundCheckName: Name? = null

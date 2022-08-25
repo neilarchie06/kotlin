@@ -190,6 +190,11 @@ class JsIrBackendContext(
     override val coroutineSymbols =
         JsCommonCoroutineSymbols(symbolTable, module, this)
 
+    override val enumEntries = getIrClass(ENUMS_PACKAGE_FQNAME.child(Name.identifier("EnumEntries")))
+    override val createEnumEntries = getFunctions(ENUMS_PACKAGE_FQNAME.child(Name.identifier("enumEntries")))
+        .find { it.valueParameters.firstOrNull()?.type?.isFunctionType == true }
+        .let { symbolTable.referenceSimpleFunction(it!!) }
+
     override val ir = object : Ir<JsIrBackendContext>(this, irModuleFragment) {
         override val symbols = object : Symbols<JsIrBackendContext>(this@JsIrBackendContext, irBuiltIns, symbolTable) {
             override val throwNullPointerException =
@@ -220,11 +225,6 @@ class JsIrBackendContext(
                 coroutineSymbols.coroutineImpl
             override val coroutineSuspendedGetter =
                 coroutineSymbols.coroutineSuspendedGetter
-
-            override val enumEntries = getIrClass(ENUMS_PACKAGE_FQNAME.child(Name.identifier("EnumEntries")))
-            override val createEnumEntries = getFunctions(ENUMS_PACKAGE_FQNAME.child(Name.identifier("enumEntries")))
-                .find { it.valueParameters.firstOrNull()?.type?.isFunctionType == true }
-                .let { symbolTable.referenceSimpleFunction(it!!) }
 
             private val _arraysContentEquals = getFunctions(FqName("kotlin.collections.contentEquals")).mapNotNull {
                 if (it.extensionReceiverParameter != null && it.extensionReceiverParameter!!.type.isNullable())
