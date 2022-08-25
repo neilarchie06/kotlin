@@ -11,8 +11,11 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.ir.getAnnotationRetention
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
+import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrEnumEntry
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetEnumValue
@@ -25,6 +28,8 @@ import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.load.java.JvmAnnotationNames
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import java.lang.annotation.ElementType
 
@@ -78,10 +83,9 @@ private class AdditionalClassAnnotationLowering(private val context: JvmBackendC
 
     private fun generateTargetAnnotation(irClass: IrClass) {
         if (irClass.hasAnnotation(JvmAnnotationNames.TARGET_ANNOTATION)) return
-        val annotationTargetMap = symbols.getAnnotationTargetMap(context.state.target)
 
         val targets = irClass.applicableTargetSet() ?: return
-        val javaTargets = targets.mapNotNullTo(HashSet()) { annotationTargetMap[it] }.sortedBy {
+        val javaTargets = targets.mapNotNullTo(HashSet(), ::mapTarget).sortedBy {
             ElementType.valueOf(it.symbol.owner.name.asString())
         }
 
@@ -104,6 +108,23 @@ private class AdditionalClassAnnotationLowering(private val context: JvmBackendC
             ).apply {
                 putValueArgument(0, vararg)
             }
+    }
+
+    private fun mapTarget(target: KotlinTarget): IrEnumEntry? {
+        return when (target) {
+            KotlinTarget.TYPE, KotlinTarget.TYPE_PARAMETER -> {
+                val elementType =
+                    context.state.module.findClassAcrossModuleDependencies(ClassId.topLevel(JvmAnnotationNames.ELEMENT_TYPE_ENUM))
+                        ?: return null
+                if (elementType.unsubstitutedInnerClassesScope.getContributedClassifier(
+                        Name.identifier("TYPE_USE"), NoLookupLocation.FROM_BACKEND
+                    ) == null
+                ) return null
+
+                if (target == KotlinTarget.TYPE) symbols.typeUseTarget else symbols.typeParameterTarget
+            }
+            else -> symbols.jvmTargetMap[target]
+        }
     }
 
     private fun generateRepeatableAnnotation(irClass: IrClass) {
