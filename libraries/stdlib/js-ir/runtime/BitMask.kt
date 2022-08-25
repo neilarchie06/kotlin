@@ -21,7 +21,7 @@ internal fun implement(vararg interfaces: dynamic): BitMask {
         }
 
         val iid: Int? = i.`$metadata$`.iid
-        val iidImask: BitMask? = iid?.let { BitMask(intArrayOf(it)) }
+        val iidImask: BitMask? = iid?.let { BitMask(arrayOf(it)) }
 
         if (iidImask != null) {
             masks.push(iidImask)
@@ -42,12 +42,12 @@ internal fun implement(vararg interfaces: dynamic): BitMask {
         }, 0)
     }
 
-    val result = BitMask(IntArray(0))
+    val result = BitMask(emptyArray())
     result.intArray = resultIntArray
     return result
 }
 
-internal class BitMask(activeBits: IntArray) {
+internal class BitMask(activeBits: Array<Int>) {
     internal var intArray: IntArray = IntArray(0)
 
     init {
