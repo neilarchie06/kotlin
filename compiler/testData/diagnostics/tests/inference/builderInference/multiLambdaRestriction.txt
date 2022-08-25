@@ -1,0 +1,14 @@
+package
+
+public fun </*0*/ R> a(/*0*/ first: R, /*1*/ second: (kotlin.collections.List<R>) -> kotlin.Unit): kotlin.Unit
+public fun </*0*/ R> b(/*0*/ first: () -> kotlin.collections.List<R>, /*1*/ second: (kotlin.collections.List<R>) -> kotlin.Unit): kotlin.Unit
+public fun </*0*/ D> buildPartList(/*0*/ left: kotlin.collections.MutableList<D>.() -> kotlin.Unit, /*1*/ right: kotlin.collections.MutableList<D>.() -> kotlin.Unit): kotlin.collections.List<D>
+public fun </*0*/ R> myBuildList(/*0*/ builder: kotlin.collections.MutableList<R>.() -> kotlin.Unit): kotlin.collections.List<R>
+public fun </*0*/ Q> select(/*0*/ a: Q, /*1*/ b: Q): Q
+public fun test1(): kotlin.Unit
+public fun test2(): kotlin.Unit
+public fun test3(): kotlin.Unit
+public fun test4(): kotlin.Unit
+public fun kotlin.collections.List<kotlin.Int>.myExt(): kotlin.Unit
+public fun </*0*/ T> kotlin.collections.List<T>.myGenericExt(): kotlin.Unit
+

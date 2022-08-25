@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.resolve.calls.tower.CandidateApplicability
 import org.jetbrains.kotlin.resolve.calls.tower.CandidateApplicability.*
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.UnwrappedType
+import org.jetbrains.kotlin.types.model.TypeParameterMarker
 
 interface TransformableToWarning<T : KotlinCallDiagnostic> {
     fun transformToWarning(): T?
@@ -65,7 +66,10 @@ class NonVarargSpread(val argument: KotlinCallArgument) : KotlinCallDiagnostic(I
     override fun report(reporter: DiagnosticReporter) = reporter.onCallArgumentSpread(argument, this)
 }
 
-class BuilderInferenceOff(val argument: KotlinCallArgument) : KotlinCallDiagnostic(RESOLVED) {
+class MultiLambdaBuilderInferenceRestriction(
+    val argument: KotlinCallArgument,
+    val typeParameter: TypeParameterMarker?
+) : KotlinCallDiagnostic(RESOLVED) {
     override fun report(reporter: DiagnosticReporter) = reporter.onCallArgument(argument, this)
 }
 

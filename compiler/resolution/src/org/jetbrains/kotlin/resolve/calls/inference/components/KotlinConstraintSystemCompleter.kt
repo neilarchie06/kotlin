@@ -227,31 +227,39 @@ class KotlinConstraintSystemCompleter(
         val useBuilderInferenceWithoutAnnotation =
             languageVersionSettings.supportsFeature(LanguageFeature.UseBuilderInferenceWithoutAnnotation)
 
+        val checkForDangerousBuilderInference =
+            !languageVersionSettings.supportsFeature(LanguageFeature.NoBuilderInferenceWithoutAnnotationRestriction)
+
+        // Let's call builder lambdas a lambda that has non-zero not fixed input type variables
+        // Given we have two or more builder lambdas, it could result in incorrect type inference due to
         val dangerousBuilderInferenceWithoutAnnotation =
             lambdaArguments.size >= 2 && lambdaArguments.count { it.notFixedInputTypeVariables().isNotEmpty() } >= 2
 
         val builder = getBuilder()
         for (argument in lambdaArguments) {
-            if (!argument.atom.hasBuilderInferenceAnnotation) {
-                if (!useBuilderInferenceWithoutAnnotation || dangerousBuilderInferenceWithoutAnnotation) {
-                    if (argument.notFixedInputTypeVariables().isNotEmpty() && dangerousBuilderInferenceWithoutAnnotation) {
-                        diagnosticsHolder.addDiagnostic(BuilderInferenceOff(argument.atom))
-                    }
-                    if (!useBuilderInferenceWithoutAnnotation) {
-                        continue
-                    }
-                }
-            }
+            val reallyHasBuilderInferenceAnnotation = argument.atom.hasBuilderInferenceAnnotation
+
+            // no annotation and builder inference without annotation is disabled
+            if (!reallyHasBuilderInferenceAnnotation && !useBuilderInferenceWithoutAnnotation) continue
 
             // Imitate having builder inference annotation. TODO: Remove after getting rid of @BuilderInference
-            if (!argument.atom.hasBuilderInferenceAnnotation && useBuilderInferenceWithoutAnnotation) {
+            if (!reallyHasBuilderInferenceAnnotation) {
                 argument.atom.hasBuilderInferenceAnnotation = true
             }
 
-            val notFixedInputTypeVariables = argument.inputTypes
-                .flatMap { it.extractTypeVariables() }.filter { it !in fixedTypeVariables }
+            val notFixedInputTypeVariables = argument.notFixedInputTypeVariables()
 
+            // lambda is subject to builder inference past this point
             if (notFixedInputTypeVariables.isEmpty()) continue
+
+            // we have dangerous inference situation
+            // if lambda annotated with BuilderInference it's probably safe, due to type shape
+            // otherwise report multi-lambda builder inference restriction diagnostic
+            if (checkForDangerousBuilderInference && dangerousBuilderInferenceWithoutAnnotation && !reallyHasBuilderInferenceAnnotation) {
+                for (variable in notFixedInputTypeVariables) {
+                    diagnosticsHolder.addDiagnostic(MultiLambdaBuilderInferenceRestriction(argument.atom, variable.typeParameter))
+                }
+            }
 
             for (variable in notFixedInputTypeVariables) {
                 builder.markPostponedVariable(notFixedTypeVariables.getValue(variable).typeVariable)
