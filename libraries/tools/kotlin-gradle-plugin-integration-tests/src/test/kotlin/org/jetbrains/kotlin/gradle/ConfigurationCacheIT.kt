@@ -142,7 +142,6 @@ class ConfigurationCacheIT : AbstractConfigurationCacheIT() {
                     incremental = true,
                     kaptOptions = BuildOptions.KaptOptions(
                         verbose = true,
-                        useWorkers = true,
                         incrementalKapt = true,
                         includeCompileClasspath = false
                     )
