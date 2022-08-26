@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
  * [KT-46649](https://youtrack.jetbrains.com/issue/KT-46649).
  */
 @RequiresOptIn(
-        message = "@SymbolName is s dangerous deprecated and internal annotation. " +
+        message = "@SymbolName is dangerous deprecated and internal annotation. " +
                 "See https://youtrack.jetbrains.com/issue/KT-46649",
         level = RequiresOptIn.Level.ERROR
 )
