@@ -14458,12 +14458,6 @@ public class DiagnosisCompilerTestFE10TestdataTestGenerated extends AbstractDiag
                 }
 
                 @Test
-                @TestMetadata("propertySubstitution.kt")
-                public void testPropertySubstitution() throws Exception {
-                    runTest("compiler/testData/diagnostics/tests/inference/builderInference/propertySubstitution.kt");
-                }
-
-                @Test
                 @TestMetadata("multiLambdaRestriction.kt")
                 public void testMultiLambdaRestriction() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/inference/builderInference/multiLambdaRestriction.kt");
@@ -14473,6 +14467,12 @@ public class DiagnosisCompilerTestFE10TestdataTestGenerated extends AbstractDiag
                 @TestMetadata("multiLambdaRestrictionDisabled.kt")
                 public void testMultiLambdaRestrictionDisabled() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/inference/builderInference/multiLambdaRestrictionDisabled.kt");
+                }
+
+                @Test
+                @TestMetadata("propertySubstitution.kt")
+                public void testPropertySubstitution() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/inference/builderInference/propertySubstitution.kt");
                 }
 
                 @Test
