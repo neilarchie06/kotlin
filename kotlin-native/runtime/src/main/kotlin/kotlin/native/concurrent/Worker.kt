@@ -86,7 +86,7 @@ public value class Worker @PublishedApi internal constructor(val id: Int) {
      * Plan job for further execution in the worker. Execute is a two-phase operation:
      * 1. [producer] function is executed on the caller's thread.
      * 2. the result of [producer] and [job] function pointer is being added to jobs queue
-     * of the selected worker.
+     * of the selected worker. Note that [job] must not capture any state itself.
      *
      * Parameter [mode] has no effect.
      *
@@ -117,11 +117,12 @@ public value class Worker @PublishedApi internal constructor(val id: Int) {
 
     /**
      * Plan job for further execution in the worker.
-     * [operation] parameter must be either frozen, or execution to be planned on the current worker.
-     * Otherwise [IllegalStateException] will be thrown.
      *
      * With -Xworker-exception-handling=use-hook, if the worker was created with `errorReporting` set to true, any exception escaping from [operation] will
      * be handled by [processUnhandledException].
+     *
+     * Legacy MM: [operation] parameter must be either frozen, or execution to be planned on the current worker.
+     * Otherwise [IllegalStateException] will be thrown.
      *
      * @param afterMicroseconds defines after how many microseconds delay execution shall happen, 0 means immediately,
      * @throws [IllegalArgumentException] on negative values of [afterMicroseconds].
