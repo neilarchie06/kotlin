@@ -186,8 +186,6 @@ public class AtomicNativePtr(private var value_: NativePtr) {
     /**
      * Compares value with [expected] and replaces it with [new] value if values matches.
      *
-     * Legacy MM: if [new] value is not null, it must be frozen or permanent object.
-     *
      * @param expected the expected value
      * @param new the new value
      * @return the old value
