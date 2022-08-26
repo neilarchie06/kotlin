@@ -9,8 +9,8 @@ import kotlinx.cinterop.*
 import kotlin.native.internal.Frozen
 
 /**
- * Note: transfer modes are meant to be used only in legacy memory manager.
- * Modern Kotlin/Native MM allows to share objects between threads without additional ceremonies.
+ * Note: modern Kotlin/Native memory manager allows to share objects between threads without additional ceremonies,
+ * so TransferMode has effect only in legacy memory manager.
  *
  *  ## Object Transfer Basics.
  *
