@@ -117,7 +117,7 @@ private class AdditionalClassAnnotationLowering(private val context: JvmBackendC
 
                 val elementType =
                     context.state.module.findClassAcrossModuleDependencies(ClassId.topLevel(JvmAnnotationNames.ELEMENT_TYPE_ENUM))
-                        ?: return null
+                        ?: error("java.lang.annotation.ElementType is unresolved in module dependencies")
                 if (elementType.unsubstitutedInnerClassesScope.getContributedClassifier(
                         Name.identifier("TYPE_USE"), NoLookupLocation.FROM_BACKEND
                     ) == null
