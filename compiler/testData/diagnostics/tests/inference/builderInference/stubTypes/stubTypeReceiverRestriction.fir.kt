@@ -1,10 +1,10 @@
-import kotlin.reflect.KCallable
+// WITH_STDLIB
 
 fun <R> a(lambda: List<R>.(R) -> Unit) {}
 
 fun <T> T.extension() {}
 
-fun use(p: KCallable<Unit>) {}
+fun use(p: Any?) {}
 
 fun test1() {
     a {
