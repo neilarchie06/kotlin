@@ -10,13 +10,13 @@ import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.reflect.KClass
 
 /**
- * [SymbolName] annotation is deprecated and became internal. Please avoid using it.
+ * [SymbolName] is a dangerous deprecated and internal annotation. Please avoid using it.
  *
  * If you absolutely need to use the annotation, please comment at
  * [KT-46649](https://youtrack.jetbrains.com/issue/KT-46649).
  */
 @RequiresOptIn(
-        message = "@SymbolName annotation is internal. " +
+        message = "@SymbolName is s dangerous deprecated and internal annotation. " +
                 "See https://youtrack.jetbrains.com/issue/KT-46649",
         level = RequiresOptIn.Level.ERROR
 )
@@ -25,7 +25,7 @@ import kotlin.reflect.KClass
 internal annotation class SymbolNameIsInternal
 
 /**
- * This annotation is deprecated and became internal. Please avoid using it.
+ * This is a dangerous deprecated and internal annotation. Please avoid using it.
  *
  * If you absolutely need to use the annotation, please comment at
  * [KT-46649](https://youtrack.jetbrains.com/issue/KT-46649).
