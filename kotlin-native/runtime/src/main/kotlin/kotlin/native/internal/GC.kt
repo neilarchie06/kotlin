@@ -9,6 +9,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.microseconds
 
 /**
+ * __Note__: this API is unstable and may change in any release.
+ *
  * Kotlin/Native uses tracing garbage collector (GC) that is executed periodically to collect objects
  * that are not reachable from the "roots", like local and global variables.
  * See [documentation](https://github.com/JetBrains/kotlin/blob/master/kotlin-native/NEW_MM.md) to learn more about
