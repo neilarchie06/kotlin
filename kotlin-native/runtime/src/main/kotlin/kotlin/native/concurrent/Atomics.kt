@@ -326,6 +326,8 @@ public class AtomicReference<T> {
 }
 
 /**
+ * Note: this class is useful only with legacy memory manager. Please use [AtomicReference] instead.
+ *
  * An atomic reference to a Kotlin object. Can be used in concurrent scenarious, but must be frozen first,
  * otherwise behaves as regular box for the value. If frozen, shall be zeroed out once no longer needed.
  * Otherwise memory leak could happen. To detect such leaks [kotlin.native.internal.GC.detectCycles]
