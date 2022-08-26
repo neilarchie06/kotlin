@@ -205,7 +205,7 @@ fun <L, K, V> twoBuilderLambdas(block: Foo<L>.() -> Unit, block2: Foo2<K, V>.() 
 
 fun test() {
     twoBuilderLambdas(
-        <!BUILDER_INFERENCE_OFF!>{
+        <!BUILDER_INFERENCE_MULTI_LAMBDA_RESTRICTION!>{
             add("")
             with (get()) {
                 with (listOf(1)) {
@@ -213,7 +213,7 @@ fun test() {
                 }
             }
         }<!>,
-        <!BUILDER_INFERENCE_OFF!>{
+        <!BUILDER_INFERENCE_MULTI_LAMBDA_RESTRICTION!>{
             put(1, "one")
             <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, OVERLOAD_RESOLUTION_AMBIGUITY, OVERLOAD_RESOLUTION_AMBIGUITY_BECAUSE_OF_STUB_TYPES!>foo11<!>(<!STUB_TYPE_IN_ARGUMENT_CAUSES_AMBIGUITY!>entries()<!>)
         }<!>
