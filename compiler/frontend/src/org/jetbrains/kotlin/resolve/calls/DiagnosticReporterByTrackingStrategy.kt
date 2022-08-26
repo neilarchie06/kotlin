@@ -342,7 +342,7 @@ class DiagnosticReporterByTrackingStrategy(
                 diagnostic as MultiLambdaBuilderInferenceRestriction
                 val typeParameter = diagnostic.typeParameter as? TypeParameterDescriptor
 
-                trace.report(
+                trace.reportDiagnosticOnce(
                     BUILDER_INFERENCE_MULTI_LAMBDA_RESTRICTION.on(
                         callArgument.psiCallArgument.valueArgument.asElement(),
                         typeParameter?.name ?: SpecialNames.NO_NAME_PROVIDED,
