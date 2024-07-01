@@ -8615,6 +8615,12 @@ public class FirPsiOldFrontendDiagnosticsTestGenerated extends AbstractFirPsiDia
       }
 
       @Test
+      @TestMetadata("smartcastOnThisInInitializationSection.kt")
+      public void testSmartcastOnThisInInitializationSection() {
+        runTest("compiler/testData/diagnostics/tests/controlFlowAnalysis/smartcastOnThisInInitializationSection.kt");
+      }
+
+      @Test
       @TestMetadata("throwInLambda.kt")
       public void testThrowInLambda() {
         runTest("compiler/testData/diagnostics/tests/controlFlowAnalysis/throwInLambda.kt");
@@ -38465,9 +38471,21 @@ public class FirPsiOldFrontendDiagnosticsTestGenerated extends AbstractFirPsiDia
       }
 
       @Test
-      @TestMetadata("newListMethodsImmutable.kt")
-      public void testNewListMethodsImmutable() {
-        runTest("compiler/testData/diagnostics/tests/testsWithJava21/newListMethodsImmutable.kt");
+      @TestMetadata("newListMethodsImmutable20.kt")
+      public void testNewListMethodsImmutable20() {
+        runTest("compiler/testData/diagnostics/tests/testsWithJava21/newListMethodsImmutable20.kt");
+      }
+
+      @Test
+      @TestMetadata("newListMethodsImmutable21.kt")
+      public void testNewListMethodsImmutable21() {
+        runTest("compiler/testData/diagnostics/tests/testsWithJava21/newListMethodsImmutable21.kt");
+      }
+
+      @Test
+      @TestMetadata("newListMethodsImmutable22.kt")
+      public void testNewListMethodsImmutable22() {
+        runTest("compiler/testData/diagnostics/tests/testsWithJava21/newListMethodsImmutable22.kt");
       }
 
       @Test
