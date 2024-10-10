@@ -61,20 +61,26 @@ abstract class KotlinBaseApiPlugin : DefaultKotlinBasePlugin(), KotlinJvmFactory
         }
     }
 
+    @Deprecated("Use API to create specific Kotlin extensions such as 'createKotlinJvmExtension()' or 'createKotlinAndroidExtension()'")
     override val kotlinExtension: KotlinProjectExtension by lazy {
         myProject.objects.newInstance(KotlinProjectExtension::class.java, myProject)
+    }
+
+    override fun createKotlinJvmExtension(): KotlinJvmExtension {
+        return myProject.objects.newInstance(KotlinJvmProjectExtension::class.java, myProject)
+    }
+
+    override fun createKotlinAndroidExtension(): KotlinAndroidExtension {
+        return myProject.objects.newInstance(KotlinAndroidProjectExtension::class.java, myProject)
     }
 
     override val kaptExtension: KaptExtension by lazy {
         myProject.objects.newInstance(KaptExtension::class.java)
     }
 
-    @Deprecated(
-        message = "Replaced by registerKotlinJvmCompileTask with module name",
-        replaceWith = ReplaceWith("registerKotlinJvmCompileTask(taskName, TODO(), TODO())")
-    )
+    @Deprecated("Replaced with 'registerKotlinJvmCompileTask(taskName, compilerOptions, explicitApiMode)'")
     override fun registerKotlinJvmCompileTask(taskName: String): TaskProvider<out KotlinJvmCompile> {
-        val extension = kotlinExtension
+        @Suppress("DEPRECATION") val extension = kotlinExtension
         return registerKotlinJvmCompileTask(
             taskName,
             createCompilerJvmOptions(),
@@ -82,14 +88,11 @@ abstract class KotlinBaseApiPlugin : DefaultKotlinBasePlugin(), KotlinJvmFactory
         )
     }
 
-    @Deprecated(
-        "Replaced by registerKotlinJvmCompileTask with compiler options and explicit API mode",
-        replaceWith = ReplaceWith("registerKotlinJvmCompileTask(taskName, TODO(), TODO())")
-    )
+    @Deprecated("Replaced with 'registerKotlinJvmCompileTask(taskName, compilerOptions, explicitApiMode)'")
     override fun registerKotlinJvmCompileTask(taskName: String, moduleName: String): TaskProvider<out KotlinJvmCompile> {
         val compilerOptions = createCompilerJvmOptions()
         compilerOptions.moduleName.convention(moduleName)
-        val extension = kotlinExtension
+        @Suppress("DEPRECATION") val extension = kotlinExtension
         return registerKotlinJvmCompileTask(
             taskName,
             compilerOptions,
@@ -120,10 +123,14 @@ abstract class KotlinBaseApiPlugin : DefaultKotlinBasePlugin(), KotlinJvmFactory
         return registeredKotlinJvmCompileTask
     }
 
+    @Deprecated("Replaced with 'registerKaptGenerateStubsTask(taskName, compileTask, kaptExtension, explicitApiMode)'")
     override fun registerKaptGenerateStubsTask(taskName: String): TaskProvider<out KaptGenerateStubs> {
         val taskConfig = KaptGenerateStubsConfig(
             myProject,
-            providerFactory.provider { kotlinExtension.explicitApi },
+            providerFactory.provider {
+                @Suppress("DEPRECATION")
+                kotlinExtension.explicitApi
+            },
             kaptExtension
         )
         return myProject.registerTask(taskName, KaptGenerateStubsTask::class.java, listOf(myProject)).also {
@@ -131,10 +138,46 @@ abstract class KotlinBaseApiPlugin : DefaultKotlinBasePlugin(), KotlinJvmFactory
         }
     }
 
+    override fun registerKaptGenerateStubsTask(
+        taskName: String,
+        compileTask: TaskProvider<out KotlinJvmCompile>,
+        kaptExtension: KaptExtensionConfig,
+        explicitApiMode: Provider<ExplicitApiMode>
+    ): TaskProvider<out KaptGenerateStubs> {
+        val taskConfig = KaptGenerateStubsConfig(
+            myProject,
+            explicitApiMode,
+            kaptExtension
+        )
+
+        val kaptGenerateStubsTask =  myProject.registerTask(
+            taskName,
+            KaptGenerateStubsTask::class.java,
+            listOf(myProject)
+        )
+
+        taskConfig.execute(kaptGenerateStubsTask)
+
+        kaptGenerateStubsTask.configure {
+            val compileTaskCompilerOptions = compileTask.get().compilerOptions
+            KaptGenerateStubsConfig.syncOptionsFromCompileTask(compileTaskCompilerOptions, it)
+        }
+
+        return kaptGenerateStubsTask
+    }
+
+    @Deprecated("Replaced with 'registerKaptTask(taskName, kaptExtension)'")
     override fun registerKaptTask(taskName: String): TaskProvider<out Kapt> {
-        val taskConfiguration = KaptWithoutKotlincConfig(myProject, kaptExtension)
+        return registerKaptTask(taskName, kaptExtension)
+    }
+
+    override fun registerKaptTask(
+        taskName: String,
+        kaptExtension: KaptExtensionConfig,
+    ): TaskProvider<out Kapt> {
+        val kaptTaskConfiguration = KaptWithoutKotlincConfig(myProject, kaptExtension)
         return myProject.registerTask(taskName, KaptWithoutKotlincTask::class.java, emptyList()).also {
-            taskConfiguration.execute(it)
+            kaptTaskConfiguration.execute(it)
         }
     }
 }

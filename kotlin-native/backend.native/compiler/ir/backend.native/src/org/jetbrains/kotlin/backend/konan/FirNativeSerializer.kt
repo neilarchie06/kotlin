@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.backend.konan
 
 import org.jetbrains.kotlin.backend.common.serialization.CompatibilityMode
+import org.jetbrains.kotlin.backend.common.serialization.IrSerializationSettings
 import org.jetbrains.kotlin.backend.common.serialization.serializeModuleIntoKlib
 import org.jetbrains.kotlin.backend.konan.driver.PhaseContext
 import org.jetbrains.kotlin.backend.konan.driver.phases.Fir2IrOutput
@@ -66,8 +67,7 @@ internal fun PhaseContext.firSerializerBase(
                                        languageVersionSettings,
                                        shouldCheckSignaturesOnUniqueness ->
                 KonanIrModuleSerializer(
-                        diagnosticReporter = irDiagnosticReporter,
-                        irBuiltIns = irBuiltIns,
+                    settings = IrSerializationSettings(
                         compatibilityMode = compatibilityMode,
                         normalizeAbsolutePaths = normalizeAbsolutePaths,
                         sourceBaseDirs = sourceBaseDirs,
@@ -75,6 +75,9 @@ internal fun PhaseContext.firSerializerBase(
                         bodiesOnlyForInlines = produceHeaderKlib,
                         publicAbiOnly = produceHeaderKlib,
                         shouldCheckSignaturesOnUniqueness = shouldCheckSignaturesOnUniqueness,
+                    ),
+                    diagnosticReporter = irDiagnosticReporter,
+                    irBuiltIns = irBuiltIns,
                 )
             },
     )

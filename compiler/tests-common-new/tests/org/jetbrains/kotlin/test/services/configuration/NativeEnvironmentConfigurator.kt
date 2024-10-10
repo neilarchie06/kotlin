@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.test.services.configuration
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.test.directives.ConfigurationDirectives
+import org.jetbrains.kotlin.test.directives.NativeEnvironmentConfigurationDirectives
+import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
 import org.jetbrains.kotlin.test.model.TestModule
 import org.jetbrains.kotlin.test.services.*
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
@@ -30,13 +32,23 @@ class NativeEnvironmentConfigurator(testServices: TestServices) : EnvironmentCon
             }
     }
 
-    val nativeTarget: KonanTarget by lazy {
+    private val defaultNativeTarget: KonanTarget by lazy {
         val userDefinedTarget = System.getProperty(TEST_PROPERTY_TEST_TARGET)
         if (userDefinedTarget != null) {
             HostManager().targets[userDefinedTarget]
                 ?: testServices.assertions.fail { "Unsupported target name specified in '$TEST_PROPERTY_TEST_TARGET': $userDefinedTarget" }
         } else {
             HostManager.host
+        }
+    }
+
+    fun getNativeTarget(module: TestModule): KonanTarget {
+        val testDefinedTarget = module.directives[NativeEnvironmentConfigurationDirectives.WITH_FIXED_TARGET].firstOrNull()
+        return if (testDefinedTarget != null) {
+            HostManager().targets[testDefinedTarget]
+                ?: testServices.assertions.fail { "Unsupported target name specified in '${NativeEnvironmentConfigurationDirectives.WITH_FIXED_TARGET}': $testDefinedTarget" }
+        } else {
+            defaultNativeTarget
         }
     }
 
@@ -49,7 +61,9 @@ class NativeEnvironmentConfigurator(testServices: TestServices) : EnvironmentCon
             result += distributionKlibPath().resolve("common").resolve("stdlib").absolutePath
         }
 
-        if (ConfigurationDirectives.WITH_PLATFORM_LIBS in module.directives) {
+        if (NativeEnvironmentConfigurationDirectives.WITH_PLATFORM_LIBS in module.directives) {
+            val nativeTarget = getNativeTarget(module)
+
             // Diagnostic tests are agnostic of native target, so host is enforced to be a target.
             distributionKlibPath().resolve("platform").resolve(nativeTarget.name).listFiles()?.forEach {
                 result += it.absolutePath
@@ -62,6 +76,9 @@ class NativeEnvironmentConfigurator(testServices: TestServices) : EnvironmentCon
 
         return result
     }
+
+    override val directiveContainers: List<DirectivesContainer>
+        get() = listOf(NativeEnvironmentConfigurationDirectives)
 }
 
 val TestServices.nativeEnvironmentConfigurator: NativeEnvironmentConfigurator

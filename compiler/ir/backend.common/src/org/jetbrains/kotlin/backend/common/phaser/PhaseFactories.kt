@@ -15,7 +15,6 @@ import kotlin.reflect.KClass
 
 annotation class PhaseDescription(
     val name: String,
-    val description: String,
     val prerequisite: Array<KClass<out FileLoweringPass>> = [],
 )
 
@@ -62,7 +61,6 @@ private fun <Context : CommonBackendContext> createFilePhase(
 
     return createSimpleNamedCompilerPhase(
         name = annotation.name,
-        description = annotation.description,
         preactions = DEFAULT_IR_ACTIONS,
         postactions = DEFAULT_IR_ACTIONS,
         prerequisite = emptySet(),
@@ -81,7 +79,7 @@ private fun <Context : CommonBackendContext> createModulePhase(
 ): SimpleNamedCompilerPhase<Context, IrModuleFragment, IrModuleFragment> {
     val annotation = loadAnnotationAndCheckPrerequisites(loweringClass, previouslyCreatedPhases)
 
-    return makeIrModulePhase(createLoweringPass, annotation.name, annotation.description)
+    return makeIrModulePhase(createLoweringPass, annotation.name)
 }
 
 private fun loadAnnotationAndCheckPrerequisites(

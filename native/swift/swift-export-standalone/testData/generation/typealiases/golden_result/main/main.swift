@@ -5,6 +5,7 @@ import KotlinRuntime
 public typealias DefaultInteger = main.RegularInteger
 public typealias RegularInteger = Swift.Int32
 public typealias ShouldHaveNoAnnotation = Swift.Int32
+public typealias abstractClss = main.ABSTRACT_CLASS
 public typealias dataObjectWithPackage = main.DATA_OBJECT_WITH_PACKAGE
 public typealias inheritanceSingleClass = main.INHERITANCE_SINGLE_CLASS
 public typealias never = Swift.Never
@@ -12,6 +13,16 @@ public typealias nullable_class = ExportedKotlinPackages.typealiases.Foo?
 public typealias nullable_primitive = Swift.Int32?
 public typealias objectWithClassInheritance = main.OBJECT_WITH_CLASS_INHERITANCE
 public typealias openClass = main.OPEN_CLASS
+open class ABSTRACT_CLASS : KotlinRuntime.KotlinBase {
+    package override init() {
+        fatalError()
+    }
+    package override init(
+        __externalRCRef: Swift.UInt
+    ) {
+        super.init(__externalRCRef: __externalRCRef)
+    }
+}
 public final class DATA_OBJECT_WITH_PACKAGE : KotlinRuntime.KotlinBase {
     public static var shared: main.DATA_OBJECT_WITH_PACKAGE {
         get {
@@ -34,7 +45,7 @@ public final class DATA_OBJECT_WITH_PACKAGE : KotlinRuntime.KotlinBase {
     private override init() {
         fatalError()
     }
-    public override init(
+    package override init(
         __externalRCRef: Swift.UInt
     ) {
         super.init(__externalRCRef: __externalRCRef)
@@ -55,7 +66,7 @@ public final class INHERITANCE_SINGLE_CLASS : main.OPEN_CLASS {
         super.init(__externalRCRef: __kt)
         __root___INHERITANCE_SINGLE_CLASS_init_initialize__TypesOfArguments__Swift_UInt__(__kt)
     }
-    public override init(
+    package override init(
         __externalRCRef: Swift.UInt
     ) {
         super.init(__externalRCRef: __externalRCRef)
@@ -70,7 +81,7 @@ public final class OBJECT_WITH_CLASS_INHERITANCE : main.OPEN_CLASS {
     private override init() {
         fatalError()
     }
-    public override init(
+    package override init(
         __externalRCRef: Swift.UInt
     ) {
         super.init(__externalRCRef: __externalRCRef)
@@ -82,7 +93,7 @@ open class OPEN_CLASS : KotlinRuntime.KotlinBase {
         super.init(__externalRCRef: __kt)
         __root___OPEN_CLASS_init_initialize__TypesOfArguments__Swift_UInt__(__kt)
     }
-    public override init(
+    package override init(
         __externalRCRef: Swift.UInt
     ) {
         super.init(__externalRCRef: __externalRCRef)
@@ -102,7 +113,7 @@ public extension ExportedKotlinPackages.typealiases.inner {
             super.init(__externalRCRef: __kt)
             typealiases_inner_Bar_init_initialize__TypesOfArguments__Swift_UInt__(__kt)
         }
-        public override init(
+        package override init(
             __externalRCRef: Swift.UInt
         ) {
             super.init(__externalRCRef: __externalRCRef)
@@ -118,7 +129,7 @@ public extension ExportedKotlinPackages.typealiases {
             super.init(__externalRCRef: __kt)
             typealiases_Foo_init_initialize__TypesOfArguments__Swift_UInt__(__kt)
         }
-        public override init(
+        package override init(
             __externalRCRef: Swift.UInt
         ) {
             super.init(__externalRCRef: __externalRCRef)

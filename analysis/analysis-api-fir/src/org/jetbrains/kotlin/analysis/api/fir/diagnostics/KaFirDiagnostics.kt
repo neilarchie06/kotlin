@@ -468,18 +468,6 @@ sealed interface KaFirDiagnostic<PSI : PsiElement> : KaDiagnosticWithPsi<PSI> {
         val altererNames: List<String?>
     }
 
-    interface ForbiddenBinaryMod : KaFirDiagnostic<PsiElement> {
-        override val diagnosticClass get() = ForbiddenBinaryMod::class
-        val forbiddenFunction: KaSymbol
-        val suggestedFunction: String
-    }
-
-    interface DeprecatedBinaryMod : KaFirDiagnostic<PsiElement> {
-        override val diagnosticClass get() = DeprecatedBinaryMod::class
-        val forbiddenFunction: KaSymbol
-        val suggestedFunction: String
-    }
-
     interface SelfCallInNestedObjectConstructorError : KaFirDiagnostic<PsiElement> {
         override val diagnosticClass get() = SelfCallInNestedObjectConstructorError::class
     }
@@ -1159,7 +1147,7 @@ sealed interface KaFirDiagnostic<PSI : PsiElement> : KaDiagnosticWithPsi<PSI> {
         override val diagnosticClass get() = OptInWithoutArguments::class
     }
 
-    interface OptInArgumentIsNotMarker : KaFirDiagnostic<KtAnnotationEntry> {
+    interface OptInArgumentIsNotMarker : KaFirDiagnostic<KtClassLiteralExpression> {
         override val diagnosticClass get() = OptInArgumentIsNotMarker::class
         val notMarkerClassId: ClassId
     }

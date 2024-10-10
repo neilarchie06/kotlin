@@ -41,7 +41,10 @@ internal class SirClassFromKtSymbol(
         when (ktSymbol.modality) {
             KaSymbolModality.OPEN -> SirModality.OPEN
             KaSymbolModality.FINAL -> SirModality.FINAL
-            KaSymbolModality.SEALED, KaSymbolModality.ABSTRACT -> SirModality.UNSPECIFIED
+            // In Swift, superclass of open class must be open.
+            // Since Kotlin abstract or sealed class can be a superclass of Kotlin open class,
+            // `open` modality should be used in Swift.
+            KaSymbolModality.SEALED, KaSymbolModality.ABSTRACT -> SirModality.OPEN
         }
     }
 
@@ -89,6 +92,7 @@ internal class SirClassFromKtSymbol(
 
     private fun kotlinBaseInitDeclaration(): SirDeclaration = buildInit {
         origin = SirOrigin.KotlinBaseInitOverride(`for` = KotlinSource(ktSymbol))
+        visibility = SirVisibility.PACKAGE // Hide from users, but not from other Swift Export modules.
         isFailable = false
         isOverride = true
         parameters.add(

@@ -33,6 +33,9 @@ import org.jetbrains.kotlin.backend.common.lower.isMovedReceiver as isMovedRecei
 
 // TODO: fix expect/actual default parameters
 
+/**
+ * Generates synthetic stubs for functions with default parameter values.
+ */
 open class DefaultArgumentStubGenerator<TContext : CommonBackendContext>(
     val context: TContext,
     private val factory: DefaultArgumentFunctionFactory,
@@ -254,6 +257,9 @@ open class DefaultArgumentStubGenerator<TContext : CommonBackendContext>(
     private fun log(msg: () -> String) = context.log { "DEFAULT-REPLACER: ${msg()}" }
 }
 
+/**
+ * Replaces call site with default parameters with the corresponding stub function.
+ */
 open class DefaultParameterInjector<TContext : CommonBackendContext>(
     protected val context: TContext,
     protected val factory: DefaultArgumentFunctionFactory,
@@ -474,7 +480,9 @@ open class DefaultParameterInjector<TContext : CommonBackendContext>(
     protected fun IrValueParameter.isMovedReceiver() = isMovedReceiverImpl()
 }
 
-// Remove default argument initializers.
+/**
+ * Removes default argument initializers.
+ */
 open class DefaultParameterCleaner(
     val context: CommonBackendContext,
     val replaceDefaultValuesWithStubs: Boolean = false
@@ -499,7 +507,9 @@ open class DefaultParameterCleaner(
     }
 }
 
-// Sets overriden symbols. Should be used in case `forceSetOverrideSymbols = false`
+/**
+ * Patch overrides for fake override dispatch functions. Should be used in case `forceSetOverrideSymbols = false`.
+ */
 class DefaultParameterPatchOverridenSymbolsLowering(
     val context: CommonBackendContext
 ) : DeclarationTransformer {

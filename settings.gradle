@@ -151,6 +151,7 @@ include ":benchmarks",
         ":native:objcexport-header-generator-analysis-api",
         ":native:objcexport-header-generator:testLibraryA",
         ":native:objcexport-header-generator:testLibraryB",
+        ":native:objcexport-header-generator:testLibraryC",
         ":native:objcexport-header-generator:testInternalLibrary",
         ":native:objcexport-header-generator:testExtensionsLibrary",
         ":core:compiler.common",
@@ -218,7 +219,7 @@ include ":kotlin-imports-dumper-compiler-plugin",
         ":kotlin-script-runtime",
         ":plugins:plugin-sandbox",
         ":plugins:plugin-sandbox:plugin-annotations",
-        ":plugins:plugin-sandbox:fir-plugin-ic-test",
+        ":plugins:plugin-sandbox:plugin-sandbox-ic-test",
         ":kotlin-metadata",
         ":kotlin-metadata-jvm",
         ":kotlinx-metadata-klib",
@@ -436,6 +437,7 @@ if (!buildProperties.inJpsBuildIdeaSync) {
             ":prepare:ide-plugin-dependencies:parcelize-compiler-plugin-for-ide",
             ":prepare:ide-plugin-dependencies:lombok-compiler-plugin-for-ide",
             ":prepare:ide-plugin-dependencies:kotlin-objcexport-header-generator-for-ide",
+            ":prepare:ide-plugin-dependencies:kotlin-swift-export-for-ide",
             ":prepare:ide-plugin-dependencies:kotlin-compiler-testdata-for-ide",
             ":prepare:ide-plugin-dependencies:kotlin-compiler-tests-for-ide",
             ":prepare:ide-plugin-dependencies:low-level-api-fir-for-ide",
@@ -488,6 +490,7 @@ include ":native:swift:sir",
         ":native:swift:sir-providers",
         ":native:swift:swift-export-standalone",
         ":native:swift:swift-export-embeddable",
+        ":native:swift:swift-export-ide",
         ":generators:sir-tests-generator"
 
 void intellij(String imlPath) {
@@ -698,6 +701,7 @@ if (!buildProperties.inJpsBuildIdeaSync) {
             ":native:native.tests",
             ":native:native.tests:driver",
             ":native:native.tests:stress",
+            ":native:native.tests:klib-ir-inliner",
             ":native:native.tests:klib-compatibility"
 
     project(':kotlin-stdlib-common').projectDir = "$rootDir/libraries/stdlib/common" as File
@@ -775,6 +779,7 @@ project(':native:objcexport-header-generator-k1').projectDir = "$rootDir/native/
 project(':native:objcexport-header-generator-analysis-api').projectDir = "$rootDir/native/objcexport-header-generator/impl/analysis-api" as File
 project(':native:objcexport-header-generator:testLibraryA').projectDir = "$rootDir/native/objcexport-header-generator/testDependencies/testLibraryA" as File
 project(':native:objcexport-header-generator:testLibraryB').projectDir = "$rootDir/native/objcexport-header-generator/testDependencies/testLibraryB" as File
+project(':native:objcexport-header-generator:testLibraryC').projectDir = "$rootDir/native/objcexport-header-generator/testDependencies/testLibraryC" as File
 project(':native:objcexport-header-generator:testInternalLibrary').projectDir = "$rootDir/native/objcexport-header-generator/testDependencies/testInternalLibrary" as File
 project(':native:objcexport-header-generator:testExtensionsLibrary').projectDir = "$rootDir/native/objcexport-header-generator/testDependencies/testExtensionsLibrary" as File
 project(':plugins:android-extensions-compiler').projectDir = "$rootDir/plugins/android-extensions/android-extensions-compiler" as File

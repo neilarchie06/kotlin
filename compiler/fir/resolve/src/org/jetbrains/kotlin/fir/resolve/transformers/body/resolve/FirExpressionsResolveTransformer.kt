@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.references.builder.buildSimpleNamedReference
 import org.jetbrains.kotlin.fir.references.impl.FirSimpleNamedReference
 import org.jetbrains.kotlin.fir.resolve.*
+import org.jetbrains.kotlin.fir.resolve.ResolutionMode.ArrayLiteralPosition
 import org.jetbrains.kotlin.fir.resolve.calls.*
 import org.jetbrains.kotlin.fir.resolve.calls.ResolvedCallArgument.VarargArgument
 import org.jetbrains.kotlin.fir.resolve.calls.candidate.Candidate
@@ -40,6 +41,7 @@ import org.jetbrains.kotlin.fir.scopes.impl.isWrappedIntegerOperator
 import org.jetbrains.kotlin.fir.scopes.impl.isWrappedIntegerOperatorForUnsignedType
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.types.builder.buildErrorTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirDefaultTransformer
@@ -606,7 +608,7 @@ open class FirExpressionsResolveTransformer(transformer: FirAbstractBodyResolveT
                         ResolutionMode.WithExpectedType(
                             it.toFirResolvedTypeRef(),
                             forceFullCompletion = false,
-                            fromAnnotationCallArgument = true,
+                            arrayLiteralPosition = ArrayLiteralPosition.AnnotationArgument,
                         )
                     } ?: ResolutionMode.ContextDependent
 
@@ -767,7 +769,13 @@ open class FirExpressionsResolveTransformer(transformer: FirAbstractBodyResolveT
         val operatorReturnTypeMatches = operatorIsSuccessful && operatorReturnTypeMatches(operatorCallReference!!.candidate)
 
         val lhsReference = leftArgument.toReference(session)
-        val lhsSymbol = lhsReference?.toResolvedVariableSymbol()
+        val lhsSymbol =
+            lhsReference?.let {
+                it.toResolvedVariableSymbol()
+                // In PCLA, calls might be not completed, thus not resolved (please, vote KTIJ-31545 if you dislike eccentric formatting)
+                    ?: (it as? FirNamedReferenceWithCandidate)?.candidateSymbol as? FirVariableSymbol<*>
+            }
+
         val lhsVariable = lhsSymbol?.fir
         val lhsIsVar = lhsVariable?.isVar == true
 
@@ -1793,9 +1801,8 @@ open class FirExpressionsResolveTransformer(transformer: FirAbstractBodyResolveT
     override fun transformArrayLiteral(arrayLiteral: FirArrayLiteral, data: ResolutionMode): FirStatement =
         whileAnalysing(session, arrayLiteral) {
             when (data) {
-                is ResolutionMode.WithExpectedType -> {
-                    // Default value of array parameter (Array<T> or primitive array such as IntArray, FloatArray, ...)
-                    // or argument for array parameter in annotation call.
+                is ResolutionMode.WithExpectedType if data.arrayLiteralPosition != null -> {
+                    // Default value of a constructor parameter inside an annotation class or an argument in an annotation call.
                     arrayLiteral.transformChildren(
                         transformer,
                         data.expectedType?.coneTypeOrNull?.arrayElementType()?.let { withExpectedType(it) }
@@ -1814,12 +1821,12 @@ open class FirExpressionsResolveTransformer(transformer: FirAbstractBodyResolveT
                 else -> {
                     // Other unsupported usage.
                     arrayLiteral.transformChildren(transformer, ResolutionMode.ContextDependent)
-                    // We set the type to Array<Any> because arguments need to have a type during resolution of the synthetic call.
+                    // We set the arrayLiteral's type to the expect type or Array<Any>
+                    // because arguments need to have a type during resolution of the synthetic call.
                     // We remove the type so that it will be set during completion to the CST of the arguments.
                     arrayLiteral.replaceConeTypeOrNull(
-                        StandardClassIds.Array.constructClassLikeType(
-                            arrayOf(StandardClassIds.Any.constructClassLikeType())
-                        )
+                        (data as? ResolutionMode.WithExpectedType)?.expectedTypeRef?.coneType
+                            ?: StandardClassIds.Array.constructClassLikeType(arrayOf(StandardClassIds.Any.constructClassLikeType()))
                     )
                     val syntheticIdCall = components.syntheticCallGenerator.generateSyntheticIdCall(
                         arrayLiteral,

@@ -145,38 +145,38 @@ object DIAGNOSTICS_LIST : DiagnosticList("FirErrors") {
         val MISSING_STDLIB_CLASS by error<PsiElement>()
         val NO_THIS by error<PsiElement>()
 
-        val DEPRECATION_ERROR by error<PsiElement>(PositioningStrategy.REFERENCED_NAME_BY_QUALIFIED) {
+        val DEPRECATION_ERROR by error<PsiElement>(PositioningStrategy.DEPRECATION) {
             parameter<Symbol>("reference")
             parameter<String>("message")
             isSuppressible = true
         }
 
-        val DEPRECATION by warning<PsiElement>(PositioningStrategy.REFERENCED_NAME_BY_QUALIFIED) {
+        val DEPRECATION by warning<PsiElement>(PositioningStrategy.DEPRECATION) {
             parameter<Symbol>("reference")
             parameter<String>("message")
         }
 
-        val VERSION_REQUIREMENT_DEPRECATION_ERROR by error<PsiElement>(PositioningStrategy.REFERENCED_NAME_BY_QUALIFIED) {
-            parameter<Symbol>("reference")
-            parameter<VersionRequirement.Version>("version")
-            parameter<String>("currentVersion")
-            parameter<String>("message")
-        }
-
-        val VERSION_REQUIREMENT_DEPRECATION by warning<PsiElement>(PositioningStrategy.REFERENCED_NAME_BY_QUALIFIED) {
+        val VERSION_REQUIREMENT_DEPRECATION_ERROR by error<PsiElement>(PositioningStrategy.DEPRECATION) {
             parameter<Symbol>("reference")
             parameter<VersionRequirement.Version>("version")
             parameter<String>("currentVersion")
             parameter<String>("message")
         }
 
-        val TYPEALIAS_EXPANSION_DEPRECATION_ERROR by error<PsiElement>(PositioningStrategy.REFERENCED_NAME_BY_QUALIFIED) {
+        val VERSION_REQUIREMENT_DEPRECATION by warning<PsiElement>(PositioningStrategy.DEPRECATION) {
+            parameter<Symbol>("reference")
+            parameter<VersionRequirement.Version>("version")
+            parameter<String>("currentVersion")
+            parameter<String>("message")
+        }
+
+        val TYPEALIAS_EXPANSION_DEPRECATION_ERROR by error<PsiElement>(PositioningStrategy.DEPRECATION) {
             parameter<Symbol>("alias")
             parameter<Symbol>("reference")
             parameter<String>("message")
             isSuppressible = true
         }
-        val TYPEALIAS_EXPANSION_DEPRECATION by warning<PsiElement>(PositioningStrategy.REFERENCED_NAME_BY_QUALIFIED) {
+        val TYPEALIAS_EXPANSION_DEPRECATION by warning<PsiElement>(PositioningStrategy.DEPRECATION) {
             parameter<Symbol>("alias")
             parameter<Symbol>("reference")
             parameter<String>("message")
@@ -249,14 +249,6 @@ object DIAGNOSTICS_LIST : DiagnosticList("FirErrors") {
         }
         val AMBIGUOUS_ALTERED_ASSIGN by error<PsiElement> {
             parameter<List<String?>>("altererNames")
-        }
-        val FORBIDDEN_BINARY_MOD by error<PsiElement>(PositioningStrategy.OPERATOR_MODIFIER) {
-            parameter<FirBasedSymbol<*>>("forbiddenFunction")
-            parameter<String>("suggestedFunction")
-        }
-        val DEPRECATED_BINARY_MOD by error<PsiElement>(PositioningStrategy.OPERATOR_MODIFIER) {
-            parameter<FirBasedSymbol<*>>("forbiddenFunction")
-            parameter<String>("suggestedFunction")
         }
         val SELF_CALL_IN_NESTED_OBJECT_CONSTRUCTOR_ERROR by error<PsiElement>()
     }
@@ -496,7 +488,7 @@ object DIAGNOSTICS_LIST : DiagnosticList("FirErrors") {
         val OPT_IN_MARKER_CAN_ONLY_BE_USED_AS_ANNOTATION_OR_ARGUMENT_IN_OPT_IN by error<PsiElement>()
 
         val OPT_IN_WITHOUT_ARGUMENTS by warning<KtAnnotationEntry>()
-        val OPT_IN_ARGUMENT_IS_NOT_MARKER by warning<KtAnnotationEntry> {
+        val OPT_IN_ARGUMENT_IS_NOT_MARKER by warning<KtClassLiteralExpression> {
             parameter<ClassId>("notMarkerClassId")
         }
         val OPT_IN_MARKER_WITH_WRONG_TARGET by error<KtAnnotationEntry> {

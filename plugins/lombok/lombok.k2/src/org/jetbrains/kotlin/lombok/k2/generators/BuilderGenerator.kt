@@ -10,13 +10,14 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.java.declarations.FirJavaClassBuilder
 import org.jetbrains.kotlin.fir.java.declarations.FirJavaMethod
 import org.jetbrains.kotlin.fir.resolve.defaultType
+import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
 import org.jetbrains.kotlin.lombok.k2.config.ConeLombokAnnotations.Builder
+import org.jetbrains.kotlin.lombok.utils.LombokNames
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
@@ -25,36 +26,39 @@ class BuilderGenerator(
 ) : AbstractBuilderGenerator<Builder>(session) {
     override val builderModality: Modality = Modality.FINAL
 
-    override fun getBuilder(classSymbol: FirClassSymbol<*>): Builder? {
-        return lombokService.getBuilder(classSymbol)
+    override val annotationClassId: ClassId = LombokNames.BUILDER_ID
+
+    override fun getBuilder(symbol: FirBasedSymbol<*>): Builder? {
+        return lombokService.getBuilder(symbol)
     }
 
     override fun constructBuilderType(builderClassId: ClassId): ConeClassLikeType {
         return builderClassId.constructClassLikeType(emptyArray(), isMarkedNullable = false)
     }
 
-    override fun getBuilderType(builderClassSymbol: FirRegularClassSymbol): ConeKotlinType {
-        return builderClassSymbol.defaultType()
+    override fun getBuilderType(builderSymbol: FirClassSymbol<*>): ConeKotlinType {
+        return builderSymbol.defaultType()
     }
 
-    override fun getBuilderMethods(
+    override fun MutableMap<Name, FirJavaMethod>.addSpecialBuilderMethods(
         builder: Builder,
         classSymbol: FirClassSymbol<*>,
-        builderClassSymbol: FirRegularClassSymbol
-    ): List<FirJavaMethod> {
-        return listOf(
-            builderClassSymbol.createJavaMethod(
-                Name.identifier(builder.buildMethodName),
+        builderSymbol: FirClassSymbol<*>,
+        existingFunctionNames: Set<Name>,
+    ) {
+        addIfNonClashing(Name.identifier(builder.buildMethodName), existingFunctionNames) {
+            builderSymbol.createJavaMethod(
+                it,
                 valueParameters = emptyList(),
                 returnTypeRef = classSymbol.defaultType().toFirResolvedTypeRef(),
                 visibility = builder.visibility.toVisibility(),
                 modality = Modality.FINAL
             )
-        )
+        }
     }
 
     override fun FirJavaClassBuilder.completeBuilder(
-        classSymbol: FirClassSymbol<*>, builderClassSymbol: FirRegularClassSymbol,
+        classSymbol: FirClassSymbol<*>, builderSymbol: FirClassSymbol<*>,
     ) {
         superTypeRefs += listOf(session.builtinTypes.anyType)
     }

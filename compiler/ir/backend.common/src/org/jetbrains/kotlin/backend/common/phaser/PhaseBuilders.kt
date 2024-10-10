@@ -47,7 +47,6 @@ infix fun <Context : CommonBackendContext, Input, Mid, Output> CompilerPhase<Con
 
 fun <Context : LoggingContext, Input, Output> createSimpleNamedCompilerPhase(
     name: String,
-    description: String,
     preactions: Set<Action<Input, Context>> = emptySet(),
     postactions: Set<Action<Output, Context>> = emptySet(),
     prerequisite: Set<AbstractNamedCompilerPhase<*, *, *>> = emptySet(),
@@ -55,7 +54,6 @@ fun <Context : LoggingContext, Input, Output> createSimpleNamedCompilerPhase(
     op: (Context, Input) -> Output
 ): SimpleNamedCompilerPhase<Context, Input, Output> = object : SimpleNamedCompilerPhase<Context, Input, Output>(
     name,
-    description,
     preactions = preactions,
     postactions = postactions.map { f ->
         fun(actionState: ActionState, data: Pair<Input, Output>, context: Context) = f(actionState, data.second, context)
@@ -71,14 +69,12 @@ fun <Context : LoggingContext, Input, Output> createSimpleNamedCompilerPhase(
 
 fun <Context : LoggingContext, Input> createSimpleNamedCompilerPhase(
     name: String,
-    description: String,
     preactions: Set<Action<Input, Context>> = emptySet(),
     postactions: Set<Action<Input, Context>> = emptySet(),
     prerequisite: Set<AbstractNamedCompilerPhase<*, *, *>> = emptySet(),
     op: (Context, Input) -> Unit
 ): SimpleNamedCompilerPhase<Context, Input, Unit> = object : SimpleNamedCompilerPhase<Context, Input, Unit>(
     name,
-    description,
     preactions = preactions,
     postactions = postactions.map { f ->
         fun(actionState: ActionState, data: Pair<Input, Unit>, context: Context) = f(actionState, data.first, context)
@@ -94,14 +90,12 @@ fun <Context : LoggingContext, Input> createSimpleNamedCompilerPhase(
 fun <Context : CommonBackendContext> makeIrModulePhase(
     lowering: (Context) -> ModuleLoweringPass,
     name: String,
-    description: String,
     prerequisite: Set<AbstractNamedCompilerPhase<Context, *, *>> = emptySet(),
     preconditions: Set<Action<IrModuleFragment, Context>> = emptySet(),
     postconditions: Set<Action<IrModuleFragment, Context>> = emptySet(),
 ): SimpleNamedCompilerPhase<Context, IrModuleFragment, IrModuleFragment> =
     createSimpleNamedCompilerPhase(
         name = name,
-        description = description,
         preactions = DEFAULT_IR_ACTIONS + preconditions,
         postactions = DEFAULT_IR_ACTIONS + postconditions,
         prerequisite = prerequisite,

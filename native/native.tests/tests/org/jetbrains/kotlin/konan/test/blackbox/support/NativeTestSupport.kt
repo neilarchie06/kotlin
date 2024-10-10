@@ -44,6 +44,8 @@ import kotlin.reflect.KParameter
 import kotlin.reflect.full.findAnnotation
 import kotlin.time.Duration
 
+const val KLIB_IR_INLINER = "klibIrInliner"
+
 class NativeBlackBoxTestSupport : BeforeEachCallback {
     /**
      * Note: [BeforeEachCallback.beforeEach] allows accessing test instances while [BeforeAllCallback.beforeAll] which may look
@@ -122,6 +124,10 @@ internal object CastCompatibleKotlinNativeClassLoader {
     val kotlinNativeClassLoader = NativeTestSupport.computeNativeClassLoader(this::class.java.classLoader)
 }
 
+internal object RegularKotlinNativeClassLoader {
+    val kotlinNativeClassLoader = NativeTestSupport.computeNativeClassLoader()
+}
+
 fun copyNativeHomeProperty() {
     System.setProperty("kotlin.native.home", ProcessLevelProperty.KOTLIN_NATIVE_HOME.readValue())
 }
@@ -141,7 +147,7 @@ object NativeTestSupport {
 
             TestProcessSettings(
                 nativeHome,
-                computeNativeClassLoader(),
+                RegularKotlinNativeClassLoader.kotlinNativeClassLoader,
                 computeBaseDirs(),
                 LLDB(nativeHome),
                 computeReleasedCompiler()
@@ -160,7 +166,7 @@ object NativeTestSupport {
      * For this, a cast of mangler object(within K/N classloader) to mangler interface(within app classloader) is needed,
      * which is possible when app classloader is provided as parent.
      */
-    fun computeNativeClassLoader(parent: ClassLoader? = null): KotlinNativeClassLoader = KotlinNativeClassLoader(
+    internal fun computeNativeClassLoader(parent: ClassLoader? = null): KotlinNativeClassLoader = KotlinNativeClassLoader(
         lazy {
             val nativeClassPath = ProcessLevelProperty.COMPILER_CLASSPATH.readValue()
                 .split(File.pathSeparatorChar)
@@ -283,6 +289,7 @@ object NativeTestSupport {
         output += computeBinaryLibraryKind(enforcedProperties)
         output += computeCInterfaceMode(enforcedProperties)
         output += computeXCTestRunner(enforcedProperties, nativeTargets)
+        output += computeKlibIrInlinerMode(tags)
 
         // Compute tests timeouts with regard to already calculated properties that may affect execution time
         output += computeTimeouts(enforcedProperties, output)
@@ -312,6 +319,12 @@ object NativeTestSupport {
             CompilerOutputInterceptor.values(),
             default = CompilerOutputInterceptor.DEFAULT
         )
+
+    private fun computeKlibIrInlinerMode(tags: Set<String>): KlibIrInlinerMode =
+        if (tags.contains(KLIB_IR_INLINER))
+            KlibIrInlinerMode.ON
+        else
+            KlibIrInlinerMode.OFF
 
     private fun computeGCType(enforcedProperties: EnforcedProperties): GCType =
         ClassLevelProperty.GC_TYPE.readValue(enforcedProperties, GCType.values(), default = GCType.UNSPECIFIED)
